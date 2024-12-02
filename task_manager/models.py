@@ -37,12 +37,19 @@ class TeamAssignment(models.Model):
     
 
 class UserAssignment(models.Model):
+    ROLE_CHOICES = [
+        ("Blocked", "Blocked"),
+        ("Junior", "Junior"),
+        ("Medior", "Medior"),
+        ("Senior", "Senior"),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    assigned_date = models.DateTimeField(auto_now_add=True)
+    level = models.CharField(max_length=10, choices=ROLE_CHOICES)
 
     def __str__(self):
-        return f"{self.user.username} assigned to {self.category.title}"
+        return f"{self.user.username} assigned to {self.category.title} with level {self.level}"
 
 
 
