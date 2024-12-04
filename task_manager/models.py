@@ -49,7 +49,7 @@ class UserAssignment(models.Model):
     level = models.CharField(max_length=10, default="Blocked", choices=ROLE_CHOICES)
 
     def __str__(self):
-        return f"{self.user.username} assigned to {self.category.title} with level {self.level}"
+        return f"{self.user_id.username} assigned to {self.category_id.title} with level {self.level}"
 
 
 
@@ -60,7 +60,7 @@ class Project(models.Model):
     team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.title
+        return self.name
 
 
 class Status(models.Model):
@@ -94,3 +94,26 @@ class Task(models.Model):
     def __str__(self):
         return self.title
     
+    def save(self, *args, **kwargs):
+        # Check if the object already exists in the database
+        if self.pk:
+            old_task = Task.objects.get(pk=self.pk)
+            if (
+                old_task.status_id != self.status_id
+                or old_task.assigned_user_id != self.assigned_user_id
+            ):
+                # Insert an audit entry
+                TaskAudit.objects.create(
+                    task_id=self,
+                    status_id=self.status_id,
+                    user_id=self.assigned_user_id
+                )
+        super().save(*args, **kwargs)
+    
+
+class TaskAudit(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    task_id = models.ForeignKey(Task, on_delete=models.CASCADE)
+    status_id = models.ForeignKey(Status, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now_add=True)
