@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ("id", "username", "email", "first_name", "last_name")  # Include fields as needed
+        fields = ("id", "username", "email", "first_name", "last_name", "is_member", "is_admin")
 
 
 class CategorySerializer(serializers.ModelSerializer):

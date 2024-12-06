@@ -5,8 +5,8 @@ from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    is_member = models.BooleanField(default=False)
-    is_admin = models.BooleanField(default=False)
+    is_member = models.BooleanField(default=False, help_text="Can access the app",)
+    is_admin = models.BooleanField(default=False, help_text="Can access the admin part of the app to manage tasks")
 
 
 class Category(models.Model):
