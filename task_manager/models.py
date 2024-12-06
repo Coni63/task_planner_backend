@@ -1,14 +1,6 @@
 import uuid
 from django.db import models
 from django.contrib.auth.models import User
-
-
-class Team(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
     
 
 class Category(models.Model):
@@ -23,16 +15,12 @@ class Category(models.Model):
 
 class TeamAssignment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
     is_admin = models.BooleanField(default=False)
     is_member = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ("user_id", "team_id")
-
     def __str__(self):
-        return f"{self.user_id} assigned in {self.team_id}"
+        return f"{self.user_id} - Admin: {self.is_admin}, Member: {self.is_member}"
     
 
 class UserAssignment(models.Model):
@@ -115,7 +103,6 @@ class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True)
-    team_id = models.ForeignKey(Team, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

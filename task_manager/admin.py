@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import (
-    Team,
     Category,
     TeamAssignment,
     UserAssignment,
@@ -12,12 +11,6 @@ from .models import (
 )
 
 
-@admin.register(Team)
-class TeamAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
-
-
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('title', 'junior_factor', 'senior_factor')
@@ -26,9 +19,9 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(TeamAssignment)
 class TeamAssignmentAdmin(admin.ModelAdmin):
-    list_display = ('user_id', 'team_id', 'is_admin', 'is_member')
+    list_display = ('user_id', 'is_admin', 'is_member')
     list_filter = ('is_admin', 'is_member')
-    search_fields = ('user_id__username', 'team_id__name')
+    search_fields = ('user_id__username', )
 
 
 @admin.register(UserAssignment)
@@ -40,9 +33,9 @@ class UserAssignmentAdmin(admin.ModelAdmin):
 
 @admin.register(Project)
 class ProjectAdmin(admin.ModelAdmin):
-    list_display = ('name', 'team_id', 'description')
-    search_fields = ('name', 'team_id__name')
-    list_filter = ('team_id',)
+    list_display = ('name', 'description')
+    search_fields = ('name',)
+    # list_filter = ()
 
 
 @admin.register(Status)
