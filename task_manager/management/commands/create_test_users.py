@@ -2,7 +2,7 @@ import datetime
 from django.core.management.base import BaseCommand
 from django.contrib.auth.models import User
 
-from task_manager.models import Category, Project, Status, Task, Team, TeamAssignment, UserAssignment
+from task_manager.models import Category, Project, ScheduleRule, Status, Task, Team, TeamAssignment, UserAssignment
 
 class Command(BaseCommand):
     help = 'Generate test data'
@@ -17,7 +17,9 @@ class Command(BaseCommand):
         self.create_team_assignments()
 
         self.create_projects()
-        self.create_tasks()
+        # self.create_tasks()
+
+        self.set_dayoff()
 
     
     def create_users(self):
@@ -109,17 +111,16 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"Project {name} {description} {team_id} already exists"))
 
     def create_tasks(self):
-        project = Project.objects.get(name="Project1")
+        project_id = Project.objects.get(name="Project1")
+        status_id = Status.objects.get(status="Status1")
+        category_id = Category.objects.get(title="Category1")
         for i in range(1, 20):
             titre = f"Task{i}"
             description = f"Task {i} description"
-            status_id = Status.objects.get(status="Status1")
-            category_id = Category.objects.get(title="Category1")
-            project_id = Project.objects.get(name="Project1")
 
             if i == 1:
                 assigned_user_id = User.objects.get(username="user1")
-                picked_at = datetime.datetime.now(datetime.timezone.utc)  # noqa: F821
+                picked_at = datetime.datetime.now(datetime.timezone.utc)
             else:
                 assigned_user_id = None
                 picked_at = None
@@ -142,8 +143,25 @@ class Command(BaseCommand):
             )
 
             if created:
-                project.save()
+                task.save()
                 self.stdout.write(self.style.SUCCESS(f"Task created: {titre} created"))
             else:
                 self.stdout.write(self.style.WARNING(f"Task {titre} already exists"))
 
+    def set_dayoff(self):
+        for userid in range(0, 11):
+            if userid == 0:
+                username = "admin"
+            else:
+                username = f"user{userid}"
+            user = User.objects.get(username=username)
+
+            av_sat, created_sat = ScheduleRule.objects.get_or_create(user_id=user, day_of_week=5, factor=0.0)
+            av_sun, created_sun = ScheduleRule.objects.get_or_create(user_id=user, day_of_week=6, factor=0.0)
+
+            if created_sat and created_sun:
+                av_sat.save()
+                av_sun.save()
+                self.stdout.write(self.style.SUCCESS(f"UserAvailability created: {user.username}"))
+            else:
+                self.stdout.write(self.style.WARNING(f"UserAvailability {user.username} already exists"))

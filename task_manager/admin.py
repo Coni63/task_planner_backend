@@ -7,8 +7,10 @@ from .models import (
     Project,
     Status,
     Task,
-    TaskAudit
+    TaskAudit,
+    ScheduleRule, ScheduleOverride
 )
+
 
 @admin.register(Team)
 class TeamAdmin(admin.ModelAdmin):
@@ -70,3 +72,34 @@ class TaskAuditAdmin(admin.ModelAdmin):
     list_display = ('task_id', 'status_id', 'user_id', 'updated_at')
     list_filter = ('status_id', 'user_id')
     search_fields = ('task_id__title', 'status_id__status', 'user_id__username')
+
+
+
+@admin.register(ScheduleRule)
+class ScheduleRuleAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for ScheduleRule.
+    """
+    list_display = ('user_id', 'day_of_week', 'factor', 'start_date', 'end_date')
+    list_filter = ('day_of_week', 'factor', 'start_date', 'end_date')
+    search_fields = ('user_id__username', 'user_id__email')
+    ordering = ('user_id', 'day_of_week', 'start_date', 'end_date')
+    fieldsets = (
+        (None, {
+            'fields': ('user_id', 'day_of_week', 'factor')
+        }),
+        ('Optional Date Range', {
+            'fields': ('start_date', 'end_date'),
+            'classes': ('collapse',),  # Makes the section collapsible in the admin
+        }),
+    )
+
+@admin.register(ScheduleOverride)
+class ScheduleOverrideAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for ScheduleOverride.
+    """
+    list_display = ('user_id', 'date', 'factor')
+    list_filter = ('date', 'factor')
+    search_fields = ('user_id__username', 'user_id__email', 'date')
+    ordering = ('user_id', 'date')

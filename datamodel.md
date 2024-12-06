@@ -33,6 +33,23 @@ Table UserAssignment {
   level varchar
 }
 
+
+Table ScheduleRule {
+  id integer [primary key]
+  user_id integer
+  day_of_week integer
+  factor float
+  start_date date
+  end_date date
+}
+
+Table ScheduleOverride {
+  id integer [primary key]
+  user_id number
+  date date
+  factor float
+}
+
 Table Project {
   id integer [primary key]
   name varchar
@@ -72,6 +89,8 @@ Table TaskDependancies {
 Ref: Team.id < TeamAssignment.team_id
 Ref: User.id < TeamAssignment.user_id
 Ref: User.id < UserAssignment.user_id
+Ref: User.id < ScheduleRule.user_id
+Ref: User.id < ScheduleOverride.user_id
 Ref: Category.id < UserAssignment.category_id
 Ref: Team.id < Project.team_id
 Ref: Project.id < Task.project_id
