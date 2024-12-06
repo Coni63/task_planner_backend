@@ -1,7 +1,46 @@
 import uuid
 from django.db import models
-from django.contrib.auth.models import User
-    
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+
+        return self.create_user(email, password, **extra_fields)
+
+
+class CustomUser(AbstractBaseUser, PermissionsMixin):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    email = models.EmailField(unique=True)
+    first_name = models.CharField(max_length=30, blank=True)
+    last_name = models.CharField(max_length=30, blank=True)
+    user_name = models.CharField(max_length=30, blank=False, unique=True)
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
+
+    objects = CustomUserManager()
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["first_name", "last_name"]
+
+    def __str__(self):
+        return self.email
 
 class Category(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -13,16 +52,6 @@ class Category(models.Model):
         return self.title
     
 
-class TeamAssignment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_id = models.ForeignKey(User, unique=True, on_delete=models.CASCADE)
-    is_admin = models.BooleanField(default=False)
-    is_member = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"{self.user_id} - Admin: {self.is_admin}, Member: {self.is_member}"
-    
-
 class UserAssignment(models.Model):
     ROLE_CHOICES = [
         ("Blocked", "Blocked"),
@@ -32,19 +61,19 @@ class UserAssignment(models.Model):
     ]
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
     level = models.CharField(max_length=10, default="Blocked", choices=ROLE_CHOICES)
 
     def __str__(self):
-        return f"{self.user_id.username} assigned to {self.category_id.title} with level {self.level}"
+        return f"{self.user_id.user_name} assigned to {self.category_id.title} with level {self.level}"
 
 
 class ScheduleRule(models.Model):
     """
     Defines recurring schedule rules for a user.
     """
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='schedule_rules')
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='schedule_rules')
     day_of_week = models.IntegerField(
         choices=[
             (0, 'Monday'),
@@ -76,14 +105,14 @@ class ScheduleRule(models.Model):
         verbose_name_plural = "Schedule Rules"
 
     def __str__(self):
-        return f"{self.user_id.username}: {self.get_day_of_week_display()} - {self.factor}"
+        return f"{self.user_id.user_name}: {self.get_day_of_week_display()} - {self.factor}"
 
 
 class ScheduleOverride(models.Model):
     """
     Defines exceptions to the regular schedule for a specific user and date.
     """
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='schedule_overrides')
+    user_id = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='schedule_overrides')
     date = models.DateField(help_text="Specific date for the override")
     factor = models.DecimalField(
         max_digits=3, decimal_places=2,
@@ -96,7 +125,7 @@ class ScheduleOverride(models.Model):
         verbose_name_plural = "Schedule Overrides"
 
     def __str__(self):
-        return f"{self.user_id.username}: {self.date} - {self.factor}"
+        return f"{self.user_id.user_name}: {self.date} - {self.factor}"
 
 
 class Project(models.Model):
@@ -122,7 +151,7 @@ class Task(models.Model):
     description = models.TextField(null=True)
     status_id = models.ForeignKey(Status, null=True, on_delete=models.CASCADE)
     project_id = models.ForeignKey(Project, on_delete=models.CASCADE)
-    assigned_user_id = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    assigned_user_id = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
     picked_at = models.DateTimeField(auto_now_add=False, null=True)
     estimated_duration = models.DurationField(default=0)
     expected_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date expected to finish this task
@@ -160,5 +189,5 @@ class TaskAudit(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     task_id = models.ForeignKey(Task, on_delete=models.CASCADE)
     status_id = models.ForeignKey(Status, on_delete=models.CASCADE)
-    user_id = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now_add=True)
