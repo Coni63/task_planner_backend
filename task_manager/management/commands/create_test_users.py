@@ -30,8 +30,13 @@ class Command(BaseCommand):
             if created:
                 user.set_password(password)
                 if i == 0:
+                    user.is_admin = True
+                    user.is_member = True
                     user.is_superuser = True
                     user.is_staff = True
+                elif i == 1:
+                    user.is_member = True
+                    user.is_admin = False
                 user.save()
                 self.stdout.write(self.style.SUCCESS(f"Created user: {username} with password: {password}"))
             else:

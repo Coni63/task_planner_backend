@@ -10,7 +10,9 @@ from .serializers import (
     ProjectSerializer,
     StatusSerializer,
     TaskSerializer,
+    TaskSimpleSerializer,
     UserAssignmentSerializer,
+    UserAssignmentSimpleSerializer,
     UserSerializer,
 )
 
@@ -19,7 +21,6 @@ class UserList(APIView):
     """
     Retrieve all users.
     """
-
     def get(self, request: Request) -> Response:
         users = CustomUser.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -56,29 +57,60 @@ class UserAssignmentList(APIView):
     """
     Retrieve all user assignments.
     """
-
     def get(self, request: Request) -> Response:
-        tasks = UserAssignment.objects.all()  # noqa: F821
-        serializer = UserAssignmentSerializer(tasks, many=True)
-        return Response(serializer.data)
-
-
-class UserAssignmentDetail(APIView):
-    """
-    Retrieve all user assignments of a single user by user ID.
-    """
-
-    def get(self, request: Request, user_id: str) -> Response:
-        user_assignments = UserAssignment.objects.filter(user=user_id)
-
-        if not user_assignments.exists():
-            raise NotFound(detail="No assignments found for the specified user")
+        user_id = request.query_params.get("user")
+        if user_id:
+            user_assignments = UserAssignment.objects.filter(user=user_id)
+            if not user_assignments.exists():
+                raise NotFound(detail="No assignments found for the specified user")
+        else:
+            user_assignments = UserAssignment.objects.all()
 
         serializer = UserAssignmentSerializer(user_assignments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def post(self, request: Request) -> Response:
+        serializer = UserAssignmentSimpleSerializer(data=request.data)
 
-# TODO: UserAssignmentCreate
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+		
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserAssignmentDetail(APIView):
+    """
+    Handle user assignments for a specific user.
+    """
+    def get(self, request: Request, assignment_id: str) -> Response:
+        try:
+            user_assignments = UserAssignment.objects.get(pk=assignment_id)
+        except UserAssignment.DoesNotExist:
+            raise NotFound(detail="UserAssignment not found")
+
+        serializer = UserAssignmentSerializer(user_assignments)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request: Request, assignment_id: str) -> Response:
+        try:
+            user_assignment = UserAssignment.objects.get(pk=assignment_id)
+            user_assignment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserAssignment.DoesNotExist:
+            raise NotFound(detail="UserAssignment not found")
+
+    def put(self, request: Request, assignment_id: str) -> Response:
+        try:
+            user_assignment = UserAssignment.objects.get(pk=assignment_id)
+        except UserAssignment.DoesNotExist:
+            raise NotFound(detail="UserAssignment not found")
+        
+        serializer = UserAssignmentSerializer(user_assignment, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ProjectList(APIView):
@@ -87,6 +119,14 @@ class ProjectList(APIView):
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
+    def post(self, request: Request) -> Response:
+        serializer = ProjectSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+		
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProjectDetail(APIView):
     def get(self, request: Request, project_id: str) -> Response:
@@ -97,6 +137,27 @@ class ProjectDetail(APIView):
 
         serializer = ProjectSerializer(project)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request: Request, project_id: str):
+        try:
+            project = UserAssignment.objects.get(pk=project_id)
+            project.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except UserAssignment.DoesNotExist:
+            raise NotFound(detail="Project not found")
+
+    def put(self, request: Request, project_id: str):
+        try:
+            project = Project.objects.get(pk=project_id)
+        except Project.DoesNotExist:
+            raise NotFound(detail="Project not found")
+        
+        serializer = ProjectSerializer(project, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class StatusList(APIView):
@@ -123,6 +184,15 @@ class TaskList(APIView):
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
+    def post(self, request: Request) -> Response:
+        serializer = TaskSimpleSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+		
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class TaskDetail(APIView):
     def get(self, request: Request, task_id: str) -> Response:
@@ -134,8 +204,36 @@ class TaskDetail(APIView):
         serializer = TaskSerializer(task)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def delete(self, request: Request, task_id: str):
+        try:
+            task = Task.objects.get(pk=task_id)
+            task.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Task.DoesNotExist:
+            raise NotFound(detail="Project not found")
 
-# TODO: TaskCreate
-# TODO: TaskUpdate
-# TODO: TaskDelete
-# TODO: Serializer with audit info
+    def put(self, request: Request, task_id: str):
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise NotFound(detail="Project not found")
+        
+        serializer = TaskSimpleSerializer(task, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# TODO: Task Serializer with audit info
+
+
+# TODO: All Users availability
+# TODO: User availability get
+# TODO: User availability create
+# TODO: User availability update
+# TODO: User availability delete
+
+# TODO: Simplify with mixins ?
+# TODO: Documentation and Authentication
+# TODO: finir postman

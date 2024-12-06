@@ -35,6 +35,12 @@ class UserAssignmentSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserAssignmentSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAssignment
+        fields = "__all__"
+
+
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
@@ -48,6 +54,12 @@ class StatusSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = "__all__"
+
+
+class TaskSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = "__all__"

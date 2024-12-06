@@ -32,6 +32,9 @@ class UserAssignment(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     level = models.CharField(max_length=10, default="Blocked", choices=ROLE_CHOICES)
 
+    class Meta:
+        unique_together = ("user", "category")
+
     def __str__(self):
         return f"{self.user.username} assigned to {self.category.title} with level {self.level}"
 
