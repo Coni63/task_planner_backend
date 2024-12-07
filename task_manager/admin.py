@@ -15,7 +15,20 @@ class CustomUserAdmin(UserAdmin):
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ("Personal Info", {"fields": ("first_name", "last_name", "username")}),
-        ("Permissions", {"fields": ("is_member", "is_admin", "is_staff", "is_active", "is_superuser", "groups", "user_permissions")}),
+        (
+            "Permissions",
+            {
+                "fields": (
+                    "is_member",
+                    "is_admin",
+                    "is_staff",
+                    "is_active",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                )
+            },
+        ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     add_fieldsets = (
@@ -34,9 +47,9 @@ class CustomUserAdmin(UserAdmin):
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
-    
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+
     list_display = ("title", "junior_factor", "senior_factor")
     search_fields = ("title",)
 
@@ -44,8 +57,8 @@ class CategoryAdmin(admin.ModelAdmin):
 @admin.register(Status)
 class StatusAdmin(admin.ModelAdmin):
     class Meta:
-        verbose_name = 'Status'
-        verbose_name_plural = 'Statuses'
+        verbose_name = "Status"
+        verbose_name_plural = "Statuses"
 
     list_display = ("status",)
     search_fields = ("status",)

@@ -21,6 +21,7 @@ class UserList(APIView):
     """
     Retrieve all users.
     """
+
     def get(self, request: Request) -> Response:
         users = CustomUser.objects.all()
         serializer = UserSerializer(users, many=True)
@@ -57,12 +58,13 @@ class UserAssignmentList(APIView):
     """
     Retrieve all user assignments.
     """
+
     def get(self, request: Request) -> Response:
         user_id = request.query_params.get("user")
         if user_id:
             user_assignments = UserAssignment.objects.filter(user=user_id)
             if not user_assignments.exists():
-                raise NotFound(detail="No assignments found for the specified user")
+                return Response([], status=status.HTTP_204_NO_CONTENT)
         else:
             user_assignments = UserAssignment.objects.all()
 
@@ -75,13 +77,15 @@ class UserAssignmentList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-		
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserAssignmentDetail(APIView):
     """
     Handle user assignments for a specific user.
     """
+
     def get(self, request: Request, assignment_id: str) -> Response:
         try:
             user_assignments = UserAssignment.objects.get(pk=assignment_id)
@@ -104,13 +108,12 @@ class UserAssignmentDetail(APIView):
             user_assignment = UserAssignment.objects.get(pk=assignment_id)
         except UserAssignment.DoesNotExist:
             raise NotFound(detail="UserAssignment not found")
-        
+
         serializer = UserAssignmentSerializer(user_assignment, data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class ProjectList(APIView):
@@ -125,8 +128,9 @@ class ProjectList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-		
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ProjectDetail(APIView):
     def get(self, request: Request, project_id: str) -> Response:
@@ -140,10 +144,10 @@ class ProjectDetail(APIView):
 
     def delete(self, request: Request, project_id: str):
         try:
-            project = UserAssignment.objects.get(pk=project_id)
+            project = Project.objects.get(pk=project_id)
             project.delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        except UserAssignment.DoesNotExist:
+        except Project.DoesNotExist:
             raise NotFound(detail="Project not found")
 
     def put(self, request: Request, project_id: str):
@@ -151,13 +155,12 @@ class ProjectDetail(APIView):
             project = Project.objects.get(pk=project_id)
         except Project.DoesNotExist:
             raise NotFound(detail="Project not found")
-        
+
         serializer = ProjectSerializer(project, data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class StatusList(APIView):
@@ -170,17 +173,23 @@ class StatusList(APIView):
 class StatusDetail(APIView):
     def get(self, request: Request, status_id: str) -> Response:
         try:
-            status = Status.objects.get(pk=status_id)
+            records = Status.objects.get(pk=status_id)
         except Status.DoesNotExist:
             raise NotFound(detail="Status not found")
 
-        serializer = StatusSerializer(status)
+        serializer = StatusSerializer(records)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class TaskList(APIView):
     def get(self, request: Request) -> Response:
-        tasks = Task.objects.all()
+        project_id = request.query_params.get("project")
+        if project_id:
+            tasks = Task.objects.filter(project=project_id)
+            if not tasks.exists():
+                return Response([], status=status.HTTP_204_NO_CONTENT)
+        else:
+            tasks = Task.objects.all()
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
@@ -190,7 +199,7 @@ class TaskList(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-		
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -217,7 +226,7 @@ class TaskDetail(APIView):
             task = Task.objects.get(pk=task_id)
         except Task.DoesNotExist:
             raise NotFound(detail="Project not found")
-        
+
         serializer = TaskSimpleSerializer(task, data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save()
@@ -227,7 +236,6 @@ class TaskDetail(APIView):
 
 # TODO: Task Serializer with audit info
 
-
 # TODO: All Users availability
 # TODO: User availability get
 # TODO: User availability create
@@ -236,4 +244,3 @@ class TaskDetail(APIView):
 
 # TODO: Simplify with mixins ?
 # TODO: Documentation and Authentication
-# TODO: finir postman

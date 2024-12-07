@@ -1,11 +1,17 @@
+import datetime
 import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class CustomUser(AbstractUser):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    is_member = models.BooleanField(default=False, help_text="Can access the app",)
+    is_member = models.BooleanField(
+        default=False,
+        help_text="Can access the app",
+    )
     is_admin = models.BooleanField(default=False, help_text="Can access the admin part of the app to manage tasks")
 
 
@@ -121,7 +127,7 @@ class Task(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     assigned_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
     picked_at = models.DateTimeField(auto_now_add=False, null=True)
-    estimated_duration = models.DurationField(default=0)
+    estimated_duration = models.DurationField(default=datetime.timedelta(days=1))
     expected_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date expected to finish this task
     estimated_finalization = models.DateTimeField(
         auto_now_add=False, null=True
@@ -133,15 +139,6 @@ class Task(models.Model):
     def __str__(self):
         return self.title
 
-    def save(self, *args, **kwargs):
-        # Check if the object already exists in the database
-        if self.pk:
-            old_task = Task.objects.get(pk=self.pk)
-            if old_task.status != self.status or old_task.assigned_user != self.assigned_user:
-                # Insert an audit entry
-                TaskAudit.objects.create(task=self, status=self.status, user=self.assigned_user)
-        super().save(*args, **kwargs)
-
 
 class TaskAudit(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -149,3 +146,30 @@ class TaskAudit(models.Model):
     status = models.ForeignKey(Status, on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now_add=True)
+
+
+@receiver(post_save, sender=Task)
+def create_task_audit(sender, instance: Task, created: Task, **kwargs):
+    """
+    Create a TaskAudit entry when a Task is created or its status/assigned user changes
+    """
+    # If it's a new task, create an audit entry
+    if created:
+        TaskAudit.objects.create(task=instance, status=instance.status, user=instance.assigned_user)
+        return
+
+    # For existing tasks, check if status or assigned user changed
+    try:
+        # Fetch the previous version of the task from the database
+        previous_task = Task.objects.get(pk=instance.pk)
+
+        # Check if status or assigned user has changed
+        status_changed = previous_task.status != instance.status
+        user_changed = previous_task.assigned_user != instance.assigned_user
+
+        # Create audit entry if either status or user has changed
+        if status_changed or user_changed:
+            TaskAudit.objects.create(task=instance, status=instance.status, user=instance.assigned_user)
+    except Task.DoesNotExist:
+        # This should rarely happen, but just in case
+        pass

@@ -15,7 +15,6 @@ from .views import (
 
 
 urlpatterns = [
-    # path('tasks/', TaskList.as_view(), name='task-list'),
     path("users/", UserList.as_view(), name="user-list"),
     path("users/<str:user_id>/", UserDetail.as_view(), name="user-detail"),
     path("categories/", CategoryList.as_view(), name="category-list"),
