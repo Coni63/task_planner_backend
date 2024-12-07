@@ -335,5 +335,3 @@ class MyTasks(APIView):
 # TODO: User availability create
 # TODO: User availability update
 # TODO: User availability delete
-
-# TODO: Simplify with mixins ?

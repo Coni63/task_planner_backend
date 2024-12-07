@@ -37,12 +37,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/auth/token/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/auth/token/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"auth",
 						"token",
@@ -70,12 +68,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/auth/token/refresh/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/auth/token/refresh/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"auth",
 						"token",
@@ -104,12 +100,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/auth/token/verify/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/auth/token/verify/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"auth",
 						"token",
@@ -136,12 +130,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/users/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/users/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"users",
@@ -167,12 +159,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/users/5be347aa-8151-4151-8487-a8036661b212",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/users/5be347aa-8151-4151-8487-a8036661b212",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"users",
@@ -198,12 +188,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/categories/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/categories/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"categories",
@@ -229,12 +217,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/user-assignement/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/user-assignement/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"user-assignement",
@@ -260,12 +246,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/user-assignement/?user=7e799bd4-6b75-4b59-8b8e-8704610cf7fc",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/user-assignement/?user=7e799bd4-6b75-4b59-8b8e-8704610cf7fc",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"user-assignement",
@@ -306,12 +290,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/user-assignement/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/user-assignement/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"user-assignement",
@@ -337,12 +319,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/user-assignement/7dc2697a-8fcb-4299-98dd-1c51c7c2c059/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/user-assignement/7dc2697a-8fcb-4299-98dd-1c51c7c2c059/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"user-assignement",
@@ -378,12 +358,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/user-assignement/687878188e2b4157a53c285757a147cd/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/user-assignement/687878188e2b4157a53c285757a147cd/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"user-assignement",
@@ -410,12 +388,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/user-assignement/990354cdf89e499c9b0317aca88c9c19/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/user-assignement/990354cdf89e499c9b0317aca88c9c19/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"user-assignement",
@@ -454,12 +430,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/projects/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/projects/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"projects",
@@ -494,12 +468,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/projects/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/projects/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"projects",
@@ -525,12 +497,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/projects/01e763c4-9fda-4e2a-9295-24fafdef64d8/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/projects/01e763c4-9fda-4e2a-9295-24fafdef64d8/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"projects",
@@ -566,12 +536,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/projects/81073fdc-8108-441d-9845-ce22e186b524/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/projects/81073fdc-8108-441d-9845-ce22e186b524/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"projects",
@@ -598,12 +566,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/projects/81073fdc-8108-441d-9845-ce22e186b524/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/projects/81073fdc-8108-441d-9845-ce22e186b524/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"projects",
@@ -630,12 +596,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/status/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/status/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"status",
@@ -661,12 +625,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/status/619a656d-609f-481d-af1f-ab9d6b01cf63/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/status/619a656d-609f-481d-af1f-ab9d6b01cf63/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"status",
@@ -693,12 +655,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/tasks/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/tasks/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"tasks",
@@ -724,12 +684,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/tasks/?project=01e763c4-9fda-4e2a-9295-24fafdef64d8",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/tasks/?project=01e763c4-9fda-4e2a-9295-24fafdef64d8",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"tasks",
@@ -770,12 +728,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/tasks/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/tasks/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"tasks",
@@ -801,12 +757,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/tasks/619a656d-609f-481d-af1f-ab9d6b01cf63/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/tasks/619a656d-609f-481d-af1f-ab9d6b01cf63/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"tasks",
@@ -842,12 +796,10 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8000/api/tasks/f71451ed-e5e6-436c-8acd-904e4a6c16f3/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/tasks/f71451ed-e5e6-436c-8acd-904e4a6c16f3/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"tasks",
@@ -874,12 +826,10 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/tasks/81073fdc-8108-441d-9845-ce22e186b524/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/tasks/81073fdc-8108-441d-9845-ce22e186b524/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"tasks",
@@ -906,12 +856,10 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:8000/api/me/tasks/",
-					"protocol": "http",
+					"raw": "{{baseUrl}}/api/me/tasks/",
 					"host": [
-						"localhost"
+						"{{baseUrl}}"
 					],
-					"port": "8000",
 					"path": [
 						"api",
 						"me",
