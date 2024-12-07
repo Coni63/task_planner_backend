@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import (
     CategoryList,
+    MyTasks,
     ProjectDetail,
     ProjectList,
     StatusDetail,
@@ -26,4 +27,6 @@ urlpatterns = [
     path("status/<str:status_id>/", StatusDetail.as_view(), name="status-list"),
     path("tasks/", TaskList.as_view(), name="task-list"),
     path("tasks/<str:task_id>/", TaskDetail.as_view(), name="task-list"),
+
+    path("me/tasks/", MyTasks.as_view(), name="my-tasks-list"),
 ]

@@ -114,6 +114,7 @@ class Project(models.Model):
 class Status(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=20)
+    active_state = models.BooleanField(default=True, help_text="An active status will be used to filter active tasks")
 
     def __str__(self):
         return self.status

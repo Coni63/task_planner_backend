@@ -3,7 +3,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.exceptions import NotFound
+from django.db.models import Q
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from .permissions import IsAdminUser
 from .models import Category, Project, Status, Task, CustomUser, UserAssignment
 from .serializers import (
     CategorySerializer,
@@ -18,22 +21,26 @@ from .serializers import (
 
 
 class UserList(APIView):
-    """
-    Retrieve all users.
-    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request: Request) -> Response:
+        """
+        Retrieve all users.
+        """
         users = CustomUser.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserDetail(APIView):
-    """
-    Retrieve a single user by ID.
-    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request: Request, user_id: str) -> Response:
+        """
+        Retrieve a single user by ID.
+        """
         try:
             user = CustomUser.objects.get(pk=user_id)
         except CustomUser.DoesNotExist:
@@ -44,22 +51,26 @@ class UserDetail(APIView):
 
 
 class CategoryList(APIView):
-    """
-    Retrieve all categories.
-    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request: Request) -> Response:
+        """
+        Retrieve all categories.
+        """
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class UserAssignmentList(APIView):
-    """
-    Retrieve all user assignments.
-    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request: Request) -> Response:
+        """
+        Retrieve all user assignments or for a single user (by id with query param 'user')
+        """
         user_id = request.query_params.get("user")
         if user_id:
             user_assignments = UserAssignment.objects.filter(user=user_id)
@@ -72,6 +83,9 @@ class UserAssignmentList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request: Request) -> Response:
+        """
+        Create a new user assignment.
+        """
         serializer = UserAssignmentSimpleSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -82,11 +96,13 @@ class UserAssignmentList(APIView):
 
 
 class UserAssignmentDetail(APIView):
-    """
-    Handle user assignments for a specific user.
-    """
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
 
     def get(self, request: Request, assignment_id: str) -> Response:
+        """
+        Get a single user assignment by id.
+        """
         try:
             user_assignments = UserAssignment.objects.get(pk=assignment_id)
         except UserAssignment.DoesNotExist:
@@ -96,6 +112,9 @@ class UserAssignmentDetail(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, assignment_id: str) -> Response:
+        """
+        Delete a user assignment by id.
+        """
         try:
             user_assignment = UserAssignment.objects.get(pk=assignment_id)
             user_assignment.delete()
@@ -104,6 +123,9 @@ class UserAssignmentDetail(APIView):
             raise NotFound(detail="UserAssignment not found")
 
     def put(self, request: Request, assignment_id: str) -> Response:
+        """
+        Update a user assignment by id.
+        """
         try:
             user_assignment = UserAssignment.objects.get(pk=assignment_id)
         except UserAssignment.DoesNotExist:
@@ -117,12 +139,21 @@ class UserAssignmentDetail(APIView):
 
 
 class ProjectList(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+
     def get(self, request: Request) -> Response:
+        """	
+        Retrieve all projects.
+        """
         projects = Project.objects.all()  # noqa: F821
         serializer = ProjectSerializer(projects, many=True)
         return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
+        """
+        Create a new project.
+        """
         serializer = ProjectSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -133,7 +164,12 @@ class ProjectList(APIView):
 
 
 class ProjectDetail(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
     def get(self, request: Request, project_id: str) -> Response:
+        """
+        Retrieve a single project by ID.
+        """
         try:
             project = Project.objects.get(pk=project_id)
         except Project.DoesNotExist:
@@ -143,6 +179,9 @@ class ProjectDetail(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, project_id: str):
+        """
+        Delete a project by ID.
+        """
         try:
             project = Project.objects.get(pk=project_id)
             project.delete()
@@ -151,6 +190,9 @@ class ProjectDetail(APIView):
             raise NotFound(detail="Project not found")
 
     def put(self, request: Request, project_id: str):
+        """
+        Update a project by ID.
+        """
         try:
             project = Project.objects.get(pk=project_id)
         except Project.DoesNotExist:
@@ -164,14 +206,26 @@ class ProjectDetail(APIView):
 
 
 class StatusList(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+
     def get(self, request: Request) -> Response:
+        """
+        Retrieve all statuses.
+        """
         statuses = Status.objects.all()
         serializer = StatusSerializer(statuses, many=True)
         return Response(serializer.data)
 
 
 class StatusDetail(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+
     def get(self, request: Request, status_id: str) -> Response:
+        """
+        Retrieve a single status by ID.
+        """
         try:
             records = Status.objects.get(pk=status_id)
         except Status.DoesNotExist:
@@ -182,7 +236,13 @@ class StatusDetail(APIView):
 
 
 class TaskList(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+
     def get(self, request: Request) -> Response:
+        """
+        Retrieve all tasks or for a single project (by id with query param 'project')
+        """
         project_id = request.query_params.get("project")
         if project_id:
             tasks = Task.objects.filter(project=project_id)
@@ -194,6 +254,9 @@ class TaskList(APIView):
         return Response(serializer.data)
 
     def post(self, request: Request) -> Response:
+        """
+        Create a new task.
+        """
         serializer = TaskSimpleSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -204,7 +267,13 @@ class TaskList(APIView):
 
 
 class TaskDetail(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminUser]
+
     def get(self, request: Request, task_id: str) -> Response:
+        """
+        Retrieve a single task by ID.
+        """
         try:
             task = Task.objects.get(pk=task_id)
         except Task.DoesNotExist:
@@ -214,6 +283,9 @@ class TaskDetail(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def delete(self, request: Request, task_id: str):
+        """
+        Delete a task by ID.
+        """
         try:
             task = Task.objects.get(pk=task_id)
             task.delete()
@@ -222,6 +294,9 @@ class TaskDetail(APIView):
             raise NotFound(detail="Project not found")
 
     def put(self, request: Request, task_id: str):
+        """
+        Update a task by ID.
+        """
         try:
             task = Task.objects.get(pk=task_id)
         except Task.DoesNotExist:
@@ -234,6 +309,25 @@ class TaskDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class MyTasks(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = []
+
+    def get(self, request: Request) -> Response:
+        """
+        Retrieve all tasks assigned to the current user.
+        """
+        my_tasks = Q(assigned_user=request.user)
+        active_tasks = Q(status__active_state=True)
+        tasks = Task.objects.filter(my_tasks & active_tasks)
+
+        if not tasks.exists():
+            return Response([], status=status.HTTP_204_NO_CONTENT)
+        
+        serializer = TaskSerializer(tasks, many=True)
+        return Response(serializer.data)
+
+
 # TODO: Task Serializer with audit info
 
 # TODO: All Users availability
@@ -243,4 +337,3 @@ class TaskDetail(APIView):
 # TODO: User availability delete
 
 # TODO: Simplify with mixins ?
-# TODO: Documentation and Authentication
