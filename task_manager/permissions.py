@@ -1,4 +1,5 @@
 from rest_framework import permissions
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class IsAdminUser(permissions.BasePermission):
     """
@@ -9,3 +10,8 @@ class IsAdminUser(permissions.BasePermission):
         # Check if the user is authenticated and has is_admin set to True
         return (request.user and request.user.is_authenticated 
                 and getattr(request.user, 'is_admin', False))
+    
+
+
+class CustomJWTAuthentication(JWTAuthentication):
+    pass

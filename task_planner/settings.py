@@ -142,7 +142,7 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
-    'TOKEN_OBTAIN_SERIALIZER': 'task_planner.auth.CustomTokenObtainPairSerializer',
+    # 'TOKEN_OBTAIN_SERIALIZER': 'task_planner.auth.CustomTokenObtainPairSerializer',
 
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SECRET_KEY,

@@ -15,10 +15,33 @@ class UserSerializer(serializers.ModelSerializer):
     Serializer for the User model to include relevant fields.
     """
 
+    name = serializers.CharField(source='username')
+
     class Meta:
         model = CustomUser
-        fields = ("id", "username", "email", "first_name", "last_name", "is_member", "is_admin")
+        fields = ("id", "name", "email", "first_name", "last_name", "is_member", "is_admin")
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        
+        # Rename the keys
+        data['firstName'] = data.pop('first_name')
+        data['lastName'] = data.pop('last_name')
+        data['isMember'] = data.pop('is_member')
+        data['isAdmin'] = data.pop('is_admin')
+        data["avatar"] = "https://ng-matero.github.io/ng-matero/images/avatar.jpg"
+        # Determine role and permissions based on isAdmin and isMember
+        if data['isAdmin']:
+            data['roles'] = ['MANAGER']
+            data['permissions'] = ["canAdd", "canEdit", "canRead"]
+        elif data['isMember']:
+            data['roles'] = ['GUEST']
+            data['permissions'] = ["canRead"]
+        else:
+            data['roles'] = []
+            data['permissions'] = []
+        
+        return data
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

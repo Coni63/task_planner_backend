@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import (
     CategoryList,
+    MyMenu,
     MyTasks,
+    Myself,
     ProjectDetail,
     ProjectList,
     StatusDetail,
@@ -13,6 +15,9 @@ from .views import (
     UserDetail,
     UserList,
 )
+from .auth import CustomTokenObtainPairView, CustomTokenRefreshView, LogoutView
+from rest_framework_simplejwt.views import TokenVerifyView
+
 
 
 urlpatterns = [
@@ -28,5 +33,13 @@ urlpatterns = [
     path("tasks/", TaskList.as_view(), name="task-list"),
     path("tasks/<str:task_id>/", TaskDetail.as_view(), name="task-list"),
 
-    path("me/tasks/", MyTasks.as_view(), name="my-tasks-list"),
+    path("auth/myself/", Myself.as_view(), name="me"),
+    path("auth/myself/menu/", MyMenu.as_view(), name="my-menu-list"),
+    path("auth/myself/tasks/", MyTasks.as_view(), name="my-tasks-list"),
+
+    # Authentication
+    path('auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
+    path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('auth/token/logout/', LogoutView.as_view(), name='logout'),
 ]

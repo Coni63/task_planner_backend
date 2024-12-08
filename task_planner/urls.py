@@ -17,10 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from rest_framework_simplejwt.views import TokenVerifyView
 
-
-from task_planner.auth import CustomTokenObtainPairView, CustomTokenRefreshView, LogoutView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -31,9 +28,5 @@ urlpatterns = [
     path('docs/swagger/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
-    # Authentication
-    path('auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
-    path('auth/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('auth/token/logout/', LogoutView.as_view(), name='logout'),
+
 ]
