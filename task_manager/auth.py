@@ -38,9 +38,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        data = response.data
 
-        access_token = data.get("access")
+        access_token = response.data.get("access")
 
         # Decode the access token (without signature verification)
         decoded_token = jwt.decode(
@@ -56,7 +55,6 @@ class CustomTokenRefreshView(TokenRefreshView):
             "token_type": "Bearer",
             "expires_in": exp - int(datetime.datetime.now().timestamp()),  # Calculate remaining time
             "exp": exp,  # Expiration timestamp
-            **{key: value for key, value in data.items() if key != "access"}  # Include any other fields
         }
         
         return Response(custom_response)

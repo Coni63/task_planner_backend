@@ -30,16 +30,22 @@ class UserSerializer(serializers.ModelSerializer):
         data['isMember'] = data.pop('is_member')
         data['isAdmin'] = data.pop('is_admin')
         data["avatar"] = "https://ng-matero.github.io/ng-matero/images/avatar.jpg"
+
         # Determine role and permissions based on isAdmin and isMember
+        permissions = {
+            "GUEST": [],
+            "MANAGER": ["canAdd", "canEdit", "canRead"],
+            "ADMIN": ["canAdd", "canEdit", "canRead", "canDelete"],
+        }
         if data['isAdmin']:
-            data['roles'] = ['MANAGER']
-            data['permissions'] = ["canAdd", "canEdit", "canRead"]
+            role = "ADMIN"
         elif data['isMember']:
-            data['roles'] = ['GUEST']
-            data['permissions'] = ["canRead"]
+            role = "MANAGER"
         else:
-            data['roles'] = []
-            data['permissions'] = []
+            role = "GUEST"
+
+        data['roles'] = [role]
+        data['permissions'] = permissions.get(role, [])
         
         return data
 
