@@ -482,6 +482,19 @@ menu = {
       "permissions": {
         "only": "ADMIN"
       }
-    }
+    },
+    {
+      "route": "my-tasks",
+      "name": "my-tasks",
+      "type": "link",
+      "icon": "description",
+      "permissions": {
+        "only": [
+          "ADMIN",
+          "MANAGER",
+          "MEMBER",
+        ]
+      }
+    },
   ]
 }

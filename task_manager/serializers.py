@@ -8,6 +8,7 @@ from .models import (
     TaskAudit,
     UserAssignment,
 )
+from django.contrib.auth.models import Permission
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -16,38 +17,42 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     name = serializers.CharField(source='username')
+    firstName = serializers.CharField(source='first_name')
+    lastName = serializers.CharField(source='last_name')
+    isMember = serializers.BooleanField(source='is_member')
+    isAdmin = serializers.BooleanField(source='is_admin')
+    roles = serializers.SlugRelatedField(
+        many=True,
+        read_only=True,
+        slug_field='name',
+        source='groups'
+    )
+    permissions = serializers.SerializerMethodField()
+    avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
-        fields = ("id", "name", "email", "first_name", "last_name", "is_member", "is_admin")
-
-    def to_representation(self, instance):
-        data = super().to_representation(instance)
+        fields = ("id", "name", "email", "firstName", "lastName", "isMember", "isAdmin", "roles", "permissions", "avatar")
+    
+    def get_permissions(self, user):
+        """
+        Return a list of unique permissions for the user, including permissions granted via groups.
+        """
+        # Get user-specific permissions
+        user_permissions = user.user_permissions.values_list('codename', flat=True)
         
-        # Rename the keys
-        data['firstName'] = data.pop('first_name')
-        data['lastName'] = data.pop('last_name')
-        data['isMember'] = data.pop('is_member')
-        data['isAdmin'] = data.pop('is_admin')
-        data["avatar"] = "https://ng-matero.github.io/ng-matero/images/avatar.jpg"
-
-        # Determine role and permissions based on isAdmin and isMember
-        permissions = {
-            "GUEST": [],
-            "MANAGER": ["canAdd", "canEdit", "canRead"],
-            "ADMIN": ["canAdd", "canEdit", "canRead", "canDelete"],
-        }
-        if data['isAdmin']:
-            role = "ADMIN"
-        elif data['isMember']:
-            role = "MANAGER"
-        else:
-            role = "GUEST"
-
-        data['roles'] = [role]
-        data['permissions'] = permissions.get(role, [])
+        # Get permissions from groups the user belongs to
+        group_permissions = Permission.objects.filter(group__user=user).values_list('codename', flat=True)
         
-        return data
+        # Combine user-specific permissions with group-based permissions and remove duplicates
+        all_permissions = set(user_permissions).union(set(group_permissions))
+        
+        return list(all_permissions)
+    
+    def get_avatar(self, user):
+        # TODO: add avatar in model
+        return "https://ng-matero.github.io/ng-matero/images/avatar.jpg"
+    
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

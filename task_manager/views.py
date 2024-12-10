@@ -333,6 +333,7 @@ class MyMenu(APIView):
             return Response([], status=status.HTTP_204_NO_CONTENT)
 
         from .menu import menu
+        # TODO: Add badges values
         return Response(menu, status=status.HTTP_200_OK)
 
 
