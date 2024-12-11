@@ -17,10 +17,6 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     name = serializers.CharField(source='username')
-    firstName = serializers.CharField(source='first_name')
-    lastName = serializers.CharField(source='last_name')
-    isMember = serializers.BooleanField(source='is_member')
-    isAdmin = serializers.BooleanField(source='is_admin')
     roles = serializers.SlugRelatedField(
         many=True,
         read_only=True,
@@ -32,7 +28,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ("id", "name", "email", "firstName", "lastName", "isMember", "isAdmin", "roles", "permissions", "avatar")
+        fields = ("id", "name", "email", "first_name", "last_name", "is_member", "is_admin", "roles", "permissions", "avatar")
     
     def get_permissions(self, user):
         """
