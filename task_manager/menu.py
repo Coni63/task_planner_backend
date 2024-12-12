@@ -1,6 +1,65 @@
 menu = {
   "menu": [
     {
+      "route": "my-tasks",
+      "name": "my-tasks",
+      "type": "link",
+      "icon": "create",
+      "permissions": {
+        "only": [
+          "ADMIN",
+          "MANAGER",
+          "MEMBER",
+        ]
+      }
+    },
+    {
+      "route": "backlog",
+      "name": "backlog",
+      "type": "sub",
+      "icon": "list",
+      "permissions": {
+        "only": [
+          "ADMIN",
+          "MANAGER",
+        ]
+      },
+      "children": [
+        {
+          "route": "backlog-table",
+          "name": "backlog-table",
+          "type": "link"
+        },
+        {
+          "route": "backlog-gantt",
+          "name": "backlog-gantt",
+          "type": "link"
+        },
+        {
+          "route": "backlog-history",
+          "name": "backlog-history",
+          "type": "link"
+        },
+        {
+          "route": "backlog-metrics",
+          "name": "backlog-metrics",
+          "type": "link"
+        }
+      ]
+    },
+    {
+      "route": "my-teams",
+      "name": "team-members",
+      "type": "link",
+      "icon": "group",
+      "permissions": {
+        "only": [
+          "ADMIN",
+          "MANAGER",
+        ]
+      }
+    },
+    {
       "route": "dashboard",
       "name": "dashboard",
       "type": "link",
@@ -482,19 +541,6 @@ menu = {
       "permissions": {
         "only": "ADMIN"
       }
-    },
-    {
-      "route": "my-tasks",
-      "name": "my-tasks",
-      "type": "link",
-      "icon": "description",
-      "permissions": {
-        "only": [
-          "ADMIN",
-          "MANAGER",
-          "MEMBER",
-        ]
-      }
-    },
+    }
   ]
 }
