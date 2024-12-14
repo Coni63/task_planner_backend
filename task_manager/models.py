@@ -108,6 +108,7 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(null=True)
 
+
     def __str__(self):
         return self.name
 
@@ -124,23 +125,23 @@ class Status(models.Model):
 
 class Task(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    title = models.CharField(max_length=255)
-    description = models.TextField(null=True)
+    reference = models.CharField(max_length=64, null=False, unique=False, default="ABC-1234")
+    reference_link = models.URLField(null=True)
+    comments = models.TextField(null=True, max_length=1000)
     status = models.ForeignKey(Status, null=True, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    assigned_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
+    picked_by = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="assigned_user")
     picked_at = models.DateTimeField(auto_now_add=False, null=True)
     estimated_duration = models.DurationField(default=datetime.timedelta(days=1))
     expected_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date expected to finish this task
-    estimated_finalization = models.DateTimeField(
-        auto_now_add=False, null=True
-    )  # based on the picked_at and estimated_duration
+    reserved_for_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="reserved_user")
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
+    order = models.IntegerField(null=True)
 
     dependencies = models.ManyToManyField("self", symmetrical=False, related_name="dependent_tasks", blank=True)
 
     def __str__(self):
-        return self.title
+        return self.reference
 
 
 class TaskAudit(models.Model):

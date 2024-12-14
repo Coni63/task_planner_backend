@@ -87,10 +87,14 @@ class TaskSerializer(serializers.ModelSerializer):
     project = ProjectSerializer(read_only=True)
     assigned_user = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
+    estimated_finalization = serializers.SerializerMethodField()
     
     class Meta:
         model = Task
         fields = "__all__"
+
+    def get_estimated_finalization(self, task):
+        return task.expected_finalization  # TODO: real computation
 
 
 class TaskSimpleSerializer(serializers.ModelSerializer):
