@@ -13,6 +13,7 @@ class CustomUser(AbstractUser):
         help_text="Can access the app",
     )
     is_admin = models.BooleanField(default=False, help_text="Can access the admin part of the app to manage tasks")
+    avatar = models.URLField(null=True, blank=True)
 
 
 class Category(models.Model):
@@ -115,6 +116,7 @@ class Status(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=20)
     active_state = models.BooleanField(default=True, help_text="An active status will be used to filter active tasks")
+    closed_state = models.BooleanField(default=False, help_text="A closed status will be used to filter closed tasks")
 
     def __str__(self):
         return self.status
