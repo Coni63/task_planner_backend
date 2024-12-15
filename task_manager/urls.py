@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    CategoryDetail,
     CategoryList,
     MyMenu,
     MyTasks,
@@ -25,6 +26,8 @@ urlpatterns = [
     path("users/", UserList.as_view(), name="user-list"),
     path("users/<str:user_id>/", UserDetail.as_view(), name="user-detail"),
     path("categories/", CategoryList.as_view(), name="category-list"),
+    path("categories/<str:category_id>/", CategoryDetail.as_view(), name="category-detail"),
+
     path("user-assignement/", UserAssignmentList.as_view(), name="user-assignement-list"),
     path("user-assignement/<str:assignment_id>/", UserAssignmentDetail.as_view(), name="user-assignement-details"),
     path("projects/", ProjectList.as_view(), name="project-list"),

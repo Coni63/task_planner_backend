@@ -63,7 +63,51 @@ class CategoryList(APIView):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request: Request) -> Response:
+        """
+        Create a new category.
+        """
+        serializer = CategorySerializer(data=request.data)
 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class CategoryDetail(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAdminUser]
+
+    def delete(self, request: Request, category_id: str) -> Response:
+        """
+        Delete a category by ID.
+        """
+        try:
+            category = Category.objects.get(pk=category_id)
+            category.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Category.DoesNotExist:
+            raise NotFound(detail="Category not found")
+        
+    def put(self, request: Request, category_id: str) -> Response:
+        """
+        Update a category by ID.
+        """
+        try:
+            category = Category.objects.get(pk=category_id)
+        except Category.DoesNotExist:
+            raise NotFound(detail="Category not found")
+
+        serializer = CategorySerializer(category, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 class UserAssignmentList(APIView):
     authentication_classes = [CustomJWTAuthentication]

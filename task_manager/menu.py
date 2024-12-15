@@ -9,6 +9,7 @@ menu = {
         "only": [
           "ADMIN",
           "MANAGER",
+          "COORDINATOR",
           "MEMBER",
         ]
       }
@@ -22,6 +23,7 @@ menu = {
         "only": [
           "ADMIN",
           "MANAGER",
+          "COORDINATOR",
         ]
       },
       "children": [
@@ -49,15 +51,55 @@ menu = {
     },
     {
       "route": "my-teams",
-      "name": "team-members",
-      "type": "link",
+      "name": "my-teams",
+      "type": "sub",
       "icon": "group",
       "permissions": {
         "only": [
           "ADMIN",
           "MANAGER",
         ]
-      }
+      },
+      "children": [
+        {
+          "route": "team-members",
+          "name": "team-members",
+          "type": "link"
+        },
+        {
+          "route": "team-availability",
+          "name": "team-availability",
+          "type": "link"
+        }
+      ]
+    },
+    {
+      "route": "configuration",
+      "name": "configuration",
+      "type": "sub",
+      "icon": "all_inbox",
+      "permissions": {
+        "only": [
+          "ADMIN",
+        ]
+      },
+      "children": [
+        {
+          "route": "categories",
+          "name": "categories",
+          "type": "link"
+        },
+        {
+          "route": "projects",
+          "name": "projects",
+          "type": "link"
+        },
+        {
+          "route": "status",
+          "name": "status",
+          "type": "link"
+        }
+      ]
     },
     {
       "route": "dashboard",
