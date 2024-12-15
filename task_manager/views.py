@@ -262,6 +262,18 @@ class StatusList(APIView):
         statuses = Status.objects.all()
         serializer = StatusSerializer(statuses, many=True)
         return Response(serializer.data)
+    
+    def post(self, request: Request) -> Response:
+        """
+        Create a new status.
+        """
+        serializer = StatusSerializer(data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StatusDetail(APIView):
@@ -280,6 +292,31 @@ class StatusDetail(APIView):
         serializer = StatusSerializer(records)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def delete(self, request: Request, status_id: str) -> Response:
+        """
+        Delete a status by ID.
+        """
+        try:
+            record = Status.objects.get(pk=status_id)
+            record.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Status.DoesNotExist:
+            raise NotFound(detail="Status not found")
+
+    def put(self, request: Request, status_id: str) -> Response:
+        """
+        Update a status by ID.
+        """
+        try:
+            record = Status.objects.get(pk=status_id)
+        except Status.DoesNotExist:
+            raise NotFound(detail="Status not found")
+
+        serializer = StatusSerializer(record, data=request.data, partial=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TaskList(APIView):
     authentication_classes = [CustomJWTAuthentication]
