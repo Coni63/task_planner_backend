@@ -85,7 +85,7 @@ class StatusSerializer(serializers.ModelSerializer):
 class TaskSerializer(serializers.ModelSerializer):
     status = StatusSerializer(read_only=True)
     project = ProjectSerializer(read_only=True)
-    assigned_user = UserSerializer(read_only=True)
+    picked_by = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     estimated_finalization = serializers.SerializerMethodField()
     

@@ -427,8 +427,8 @@ class MyTasks(APIView):
         """
         Retrieve all tasks assigned to the current user.
         """
-        my_tasks = Q(assigned_user=request.user)
-        active_tasks = Q(status__active_state=True)
+        my_tasks = Q(picked_by=request.user)
+        active_tasks = Q(status__state='active')
         tasks = Task.objects.filter(my_tasks & active_tasks)
 
         if not tasks.exists():

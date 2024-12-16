@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.core.exceptions import ValidationError
 
 
 class CustomUser(AbstractUser):
@@ -107,17 +108,28 @@ class Project(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     description = models.TextField(null=True)
-
+    trigram = models.CharField(max_length=3, null=False, unique=True)
+    order = models.IntegerField(null=True)
 
     def __str__(self):
         return self.name
 
 
 class Status(models.Model):
+
+    class States(models.TextChoices):
+        PENDING = 'pending'
+        ACTIVE = 'active'
+        CLOSED = 'closed'
+        BLOCKED = 'blocked'
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=20)
-    active_state = models.BooleanField(default=True, help_text="An active status will be used to filter active tasks")
-    closed_state = models.BooleanField(default=False, help_text="A closed status will be used to filter closed tasks")
+    state = models.CharField(
+        max_length=10,
+        choices=States.choices,
+        default=States.BLOCKED,
+    )
 
     def __str__(self):
         return self.status
@@ -130,11 +142,11 @@ class Task(models.Model):
     comments = models.TextField(null=True, max_length=1000)
     status = models.ForeignKey(Status, null=True, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    picked_by = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="assigned_user")
+    picked_by = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="picked_by")
     picked_at = models.DateTimeField(auto_now_add=False, null=True)
     estimated_duration = models.DurationField(default=datetime.timedelta(days=1))
     expected_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date expected to finish this task
-    reserved_for_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="reserved_user")
+    reserved_for_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="reserved_for_user")
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
     order = models.IntegerField(null=True)
 
@@ -159,7 +171,7 @@ def create_task_audit(sender, instance: Task, created: Task, **kwargs):
     """
     # If it's a new task, create an audit entry
     if created:
-        TaskAudit.objects.create(task=instance, status=instance.status, user=instance.assigned_user)
+        TaskAudit.objects.create(task=instance, status=instance.status, user=instance.picked_by)
         return
 
     # For existing tasks, check if status or assigned user changed
@@ -169,11 +181,11 @@ def create_task_audit(sender, instance: Task, created: Task, **kwargs):
 
         # Check if status or assigned user has changed
         status_changed = previous_task.status != instance.status
-        user_changed = previous_task.assigned_user != instance.assigned_user
+        user_changed = previous_task.picked_by != instance.picked_by
 
         # Create audit entry if either status or user has changed
         if status_changed or user_changed:
-            TaskAudit.objects.create(task=instance, status=instance.status, user=instance.assigned_user)
+            TaskAudit.objects.create(task=instance, status=instance.status, user=instance.picked_by)
     except Task.DoesNotExist:
         # This should rarely happen, but just in case
         pass
