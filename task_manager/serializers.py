@@ -25,10 +25,12 @@ class UserSerializer(serializers.ModelSerializer):
     )
     permissions = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
+    categories = serializers.SerializerMethodField()  # Custom field for categories with levels
+
 
     class Meta:
         model = CustomUser
-        fields = ("id", "name", "email", "first_name", "last_name", "is_member", "is_admin", "roles", "permissions", "avatar")
+        fields = ("id", "name", "email", "first_name", "last_name", "is_member", "is_admin", "roles", "permissions", "avatar", "categories")
     
     def get_permissions(self, user):
         """
@@ -47,7 +49,37 @@ class UserSerializer(serializers.ModelSerializer):
     
     def get_avatar(self, user):
         return user.avatar if user.avatar else "https://ng-matero.github.io/ng-matero/images/avatar.jpg"
-    
+
+
+    def get_categories(self, user: CustomUser):
+        """
+        Return all categories with their corresponding skill level for the user.
+        """
+        # Get all categories
+        categories = Category.objects.all()
+        
+        # Get user assignments for the given user
+        user_assignments = UserAssignment.objects.filter(user=user)
+        
+        # Serialize each category and attach the user's level (or "Blocked" if no assignment exists)
+        ans = [
+            {
+                "id": None,
+                "user": user.id,
+                "category": CategorySerializer(category).data,
+                "level": "Blocked"
+            }
+            for category in categories
+        ]
+        for assignment in user_assignments:
+            for i, category in enumerate(ans):
+                if category["category"]["id"] == str(assignment.category.id):
+                    ans[i]["id"] = assignment.id
+                    ans[i]["level"] = assignment.level
+                    break
+
+        return ans
+
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

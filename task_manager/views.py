@@ -30,7 +30,7 @@ class UserList(APIView):
         """
         Retrieve all users.
         """
-        users = CustomUser.objects.all()
+        users = CustomUser.objects.prefetch_related('userassignment_set').all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -444,7 +444,7 @@ class TaskListView(APIView):
         serializer.is_valid(raise_exception=True)
         params = serializer.validated_data
         
-        query_base = Task.objects.filter(status__closed_state=True)
+        query_base = Task.objects.filter(status__state='closed')
         
         # Filtering based on individual column search
         for col in params['columns']:
