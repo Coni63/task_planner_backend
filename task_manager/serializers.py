@@ -120,6 +120,7 @@ class TaskSerializer(serializers.ModelSerializer):
     picked_by = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
     estimated_finalization = serializers.SerializerMethodField()
+    at_risk = serializers.SerializerMethodField()
     
     class Meta:
         model = Task
@@ -127,6 +128,12 @@ class TaskSerializer(serializers.ModelSerializer):
 
     def get_estimated_finalization(self, task):
         return task.expected_finalization  # TODO: real computation
+    
+    def get_at_risk(self, task):
+        estimated_finalization = self.get_estimated_finalization(task)
+        if estimated_finalization is None or estimated_finalization is None:
+            return False
+        return self.get_estimated_finalization(task) > task.expected_finalization
 
 
 class TaskSimpleSerializer(serializers.ModelSerializer):
@@ -168,3 +175,8 @@ class SearchRequestModelSerializer(serializers.Serializer):
     start = serializers.IntegerField(default=0)
     length = serializers.IntegerField(required=False, allow_null=True)
     search = SearchModelSerializer(required=False, allow_null=True)
+
+
+class TaskOrderSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    order = serializers.IntegerField(allow_null=True)

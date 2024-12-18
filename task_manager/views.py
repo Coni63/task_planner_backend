@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
-
+from django.db.models import Case, When, Value, IntegerField
 
 from .permissions import CustomJWTAuthentication, IsAdminUser
 from .models import Category, Project, Status, Task, CustomUser, UserAssignment
@@ -14,6 +14,7 @@ from .serializers import (
     ProjectSerializer,
     SearchRequestModelSerializer,
     StatusSerializer,
+    TaskOrderSerializer,
     TaskSerializer,
     TaskSimpleSerializer,
     UserAssignmentSerializer,
@@ -327,12 +328,29 @@ class TaskList(APIView):
         Retrieve all tasks or for a single project (by id with query param 'project')
         """
         project_id = request.query_params.get("project")
+
+        open_tasks = ~Q(status__state = "Closed")
+
         if project_id:
-            tasks = Task.objects.filter(project=project_id)
+            for_project = ~Q(project = project_id)
+
+            tasks = Task.objects.filter(open_tasks & for_project).annotate(
+                order_nulls_last=Case(
+                    When(order=None, then=Value(float('inf'))),  # None becomes "infinity"
+                    default='order',
+                    output_field=IntegerField()
+                )
+            ).order_by('order_nulls_last', 'created_at')
             if not tasks.exists():
                 return Response([], status=status.HTTP_204_NO_CONTENT)
         else:
-            tasks = Task.objects.all()
+            tasks = Task.objects.filter(open_tasks).annotate(
+                order_nulls_last=Case(
+                    When(order=None, then=Value(float('inf'))),  # None becomes "infinity"
+                    default='order',
+                    output_field=IntegerField()
+                )
+            ).order_by('order_nulls_last', 'created_at')
         serializer = TaskSerializer(tasks, many=True)
         return Response(serializer.data)
 
@@ -439,6 +457,9 @@ class MyTasks(APIView):
 
 
 class TaskListView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request, *args, **kwargs):
         serializer = SearchRequestModelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -485,10 +506,30 @@ class TaskListView(APIView):
         
         return Response(response_data, status=status.HTTP_200_OK)
 
+class TaskOrderView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def put(self, request, *args, **kwargs):
+        # Validate incoming data
+        serializer = TaskOrderSerializer(data=request.data, many=True)
+        serializer.is_valid(raise_exception=True)
+        
+        # Reset all task orders to null
+        Task.objects.update(order=None)  # Resets the order field for all tasks
 
+        # Update only the provided tasks with their new order
+        tasks_to_update = []
+        for task_data in serializer.validated_data:
+            task = Task.objects.get(pk=task_data['id'])
+            if task:
+                task.order = task_data['order']
+                tasks_to_update.append(task)
+        
+        # Bulk update to minimize queries
+        Task.objects.bulk_update(tasks_to_update, ['order'])
 
-
-# TODO: Task Serializer with audit info
+        return Response({'message': 'Task order updated successfully'}, status=status.HTTP_200_OK)
 
 # TODO: All Users availability
 # TODO: User availability get

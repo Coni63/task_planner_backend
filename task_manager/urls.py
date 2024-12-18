@@ -12,6 +12,7 @@ from .views import (
     TaskDetail,
     TaskList,
     TaskListView,
+    TaskOrderView,
     UserAssignmentDetail,
     UserAssignmentList,
     UserDetail,
@@ -35,6 +36,7 @@ urlpatterns = [
     path("status/", StatusList.as_view(), name="status-list"),
     path("status/<str:status_id>/", StatusDetail.as_view(), name="status-list"),
     path("tasks/", TaskList.as_view(), name="task-list"),
+    path("tasks-order/", TaskOrderView.as_view(), name="task-order"),
     path("tasks-history/", TaskListView.as_view(), name="task-history-list"),
     path("tasks/<str:task_id>/", TaskDetail.as_view(), name="task-list"),
 
