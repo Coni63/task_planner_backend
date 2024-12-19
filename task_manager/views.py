@@ -1,3 +1,4 @@
+import datetime
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -408,6 +409,50 @@ class TaskDetail(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def patch(self, request, *args, **kwargs):
+        # Extract the ID from the URL or request body
+        task_id = kwargs.get('id') or request.data.get('id')
+        
+        # Validate that the task exists
+        try:
+            task = Task.objects.get(id=task_id)
+        except Task.DoesNotExist:
+            return Response({"error": "Task not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        # Pass the instance to the serializer for partial update
+        serializer = TaskSimpleSerializer(task, data=request.data, partial=True)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class TaskPickView(APIView):
+    authentication_classes = [CustomJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request: Request) -> Response:
+
+        if Task.objects.filter(picked_by=request.user).filter(status__state='active').exists():
+            return Response({"error": "User already has an active task"}, status=status.HTTP_412_PRECONDITION_FAILED)
+
+        my_categories = UserAssignment.objects.filter(user=request.user).filter(~Q(level="Blocked")).values_list('category', flat=True)
+
+        next_task = Task.objects.filter(category__in=my_categories).filter(status__state='pending').order_by('order').first()
+
+        if not next_task:
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+        
+        next_task.picked_by = request.user
+        next_task.picked_at = datetime.datetime.now(datetime.timezone.utc)
+        next_task.status = Status.objects.get(status='In Progress')
+        next_task.save()
+
+        serializer = TaskSerializer(next_task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 
 class Myself(APIView):
@@ -530,6 +575,7 @@ class TaskOrderView(APIView):
         Task.objects.bulk_update(tasks_to_update, ['order'])
 
         return Response({'message': 'Task order updated successfully'}, status=status.HTTP_200_OK)
+
 
 # TODO: All Users availability
 # TODO: User availability get
