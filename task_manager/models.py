@@ -15,6 +15,7 @@ class CustomUser(AbstractUser):
     )
     is_admin = models.BooleanField(default=False, help_text="Can access the admin part of the app to manage tasks")
     avatar = models.URLField(null=True, blank=True)
+    categories = models.ManyToManyField('Category', through='UserAssignment')
 
 
 class Category(models.Model):

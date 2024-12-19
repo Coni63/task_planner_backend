@@ -50,34 +50,30 @@ class UserSerializer(serializers.ModelSerializer):
     def get_avatar(self, user):
         return user.avatar if user.avatar else "https://ng-matero.github.io/ng-matero/images/avatar.jpg"
 
-
     def get_categories(self, user: CustomUser):
         """
         Return all categories with their corresponding skill level for the user.
         """
-        # Get all categories
+        # Get all categories (LEFT side of the "outer join")
         categories = Category.objects.all()
         
-        # Get user assignments for the given user
-        user_assignments = UserAssignment.objects.filter(user=user)
+        # Get user assignments (RIGHT side of the "outer join")
+        user_assignments = {assignment.category_id: assignment for assignment in user.userassignment_set.all()}
         
-        # Serialize each category and attach the user's level (or "Blocked" if no assignment exists)
-        ans = [
-            {
-                "id": None,
+        ans = []
+        
+        for category in categories:
+            # Check if this category has an assignment for the user
+            assignment = user_assignments.get(category.id)
+            
+            # If an assignment exists, use its level; otherwise, default to "Blocked"
+            ans.append({
+                "id": assignment.id if assignment else None,
                 "user": user.id,
                 "category": CategorySerializer(category).data,
-                "level": "Blocked"
-            }
-            for category in categories
-        ]
-        for assignment in user_assignments:
-            for i, category in enumerate(ans):
-                if category["category"]["id"] == str(assignment.category.id):
-                    ans[i]["id"] = assignment.id
-                    ans[i]["level"] = assignment.level
-                    break
-
+                "level": assignment.level if assignment else "Blocked"
+            })
+        
         return ans
 
 

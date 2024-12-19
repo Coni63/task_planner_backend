@@ -31,7 +31,7 @@ class UserList(APIView):
         """
         Retrieve all users.
         """
-        users = CustomUser.objects.prefetch_related('userassignment_set').all()
+        users = CustomUser.objects.prefetch_related('categories').all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
