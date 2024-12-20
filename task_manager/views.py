@@ -330,10 +330,10 @@ class TaskList(APIView):
         """
         project_id = request.query_params.get("project")
 
-        open_tasks = ~Q(status__state = "Closed")
+        open_tasks = ~Q(status__state = "closed")
 
         if project_id:
-            for_project = ~Q(project = project_id)
+            for_project = Q(project = project_id)
 
             tasks = Task.objects.filter(open_tasks & for_project).annotate(
                 order_nulls_last=Case(

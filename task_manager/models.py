@@ -131,6 +131,8 @@ class Status(models.Model):
         choices=States.choices,
         default=States.BLOCKED,
     )
+    color = models.CharField(max_length=7, default="#000000")
+    dark_color = models.CharField(max_length=7, default="#000000")
 
     def __str__(self):
         return self.status
