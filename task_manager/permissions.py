@@ -11,7 +11,14 @@ class IsAdminUser(permissions.BasePermission):
         return (request.user and request.user.is_authenticated 
                 and getattr(request.user, 'is_admin', False))
     
+class IsActiveUser(permissions.BasePermission):
+    """
+    Custom permission to only allow inactive users.
+    """
 
+    def has_permission(self, request, view):
+        # Check if the user is authenticated and active
+        return request.user and request.user.is_authenticated and request.user.is_active
 
 class CustomJWTAuthentication(JWTAuthentication):
     pass
