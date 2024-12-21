@@ -8,7 +8,8 @@ from task_manager.views.base_view import BaseAuthenticatedView
 
 
 class UserAssignmentList(BaseAuthenticatedView):
-    base_serializer_class = UserAssignmentSimpleSerializer
+    input_serializer_class = UserAssignmentSimpleSerializer
+    output_serializer_class = UserAssignmentSerializer
     base_model_class = UserAssignment
 
     def get(self, request: Request) -> Response:
@@ -35,7 +36,8 @@ class UserAssignmentList(BaseAuthenticatedView):
 
 
 class UserAssignmentDetail(BaseAuthenticatedView):
-    base_serializer_class = UserAssignmentSerializer
+    input_serializer_class = UserAssignmentSimpleSerializer
+    output_serializer_class = UserAssignmentSerializer
     base_model_class = UserAssignment
 
     def get(self, request: Request, assignment_id: str) -> Response:
@@ -54,4 +56,4 @@ class UserAssignmentDetail(BaseAuthenticatedView):
         """
         Update a user assignment by id.
         """
-        self.update_object(assignment_id, request.data)
+        return self.update_object(assignment_id, request.data)

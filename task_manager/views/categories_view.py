@@ -8,8 +8,9 @@ from task_manager.views.base_view import BaseAuthenticatedView
 
 
 class CategoryList(BaseAuthenticatedView):
-    base_serializer_class = Category
-    base_model_class = CategorySerializer
+    input_serializer_class = CategorySerializer
+    output_serializer_class = CategorySerializer
+    base_model_class = Category
 
     def get(self, request: Request) -> Response:
         """
@@ -25,6 +26,9 @@ class CategoryList(BaseAuthenticatedView):
 
 
 class CategoryDetail(BaseAuthenticatedView):
+    input_serializer_class = CategorySerializer
+    output_serializer_class = CategorySerializer
+
     def delete(self, request: Request, category_id: str) -> Response:
         """
         Delete a category by ID.

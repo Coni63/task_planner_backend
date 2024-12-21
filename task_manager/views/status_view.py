@@ -8,7 +8,8 @@ from task_manager.views.base_view import BaseAuthenticatedView
 
 
 class StatusList(BaseAuthenticatedView):
-    base_serializer_class = StatusSerializer
+    input_serializer_class = StatusSerializer
+    output_serializer_class = StatusSerializer
     base_model_class = Status
 
     def get(self, request: Request) -> Response:
@@ -25,6 +26,10 @@ class StatusList(BaseAuthenticatedView):
 
 
 class StatusDetail(BaseAuthenticatedView):
+    input_serializer_class = StatusSerializer
+    output_serializer_class = StatusSerializer
+    base_model_class = Status
+    
     def get(self, request: Request, status_id: str) -> Response:
         """
         Retrieve a single status by ID.

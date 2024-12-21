@@ -7,8 +7,9 @@ from task_manager.views.base_view import BaseAuthenticatedView
 
 
 class ProjectList(BaseAuthenticatedView):
-    base_serializer_class = Project
-    base_model_class = ProjectSerializer
+    input_serializer_class = ProjectSerializer
+    output_serializer_class = ProjectSerializer
+    base_model_class = Project
 
     def get(self, request: Request) -> Response:
         """	
@@ -24,6 +25,9 @@ class ProjectList(BaseAuthenticatedView):
 
 
 class ProjectDetail(BaseAuthenticatedView):
+    input_serializer_class = ProjectSerializer
+    output_serializer_class = ProjectSerializer
+
     def get(self, request: Request, project_id: str) -> Response:
         """
         Retrieve a single project by ID.

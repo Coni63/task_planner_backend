@@ -15,7 +15,8 @@ class BaseAuthenticatedView(APIView):
     authenticated users, but other requests are restricted to admin users.
     """
     authentication_classes = [CustomJWTAuthentication]
-    base_serializer_class: Type[BaseSerializer] = None
+    input_serializer_class: Type[BaseSerializer] = None
+    output_serializer_class: Type[BaseSerializer] = None
     base_model_class: Type[Model] = None
 
     def get_permissions(self):
@@ -32,7 +33,7 @@ class BaseAuthenticatedView(APIView):
         if not objects.exists():
             Response([], status=status.HTTP_200_OK)
 
-        serializer = self.base_serializer_class(objects, many=True)
+        serializer = self.output_serializer_class(objects, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def get_object(self, object_id):
@@ -44,18 +45,20 @@ class BaseAuthenticatedView(APIView):
         except self.base_model_class.DoesNotExist:
             raise NotFound(detail=f"{self.base_model_class.__name__} not found")
 
-        serializer = self.base_serializer_class(object)
+        serializer = self.output_serializer_class(object)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create_object(self, data):
         """
         Create a new object.
         """
-        serializer = self.base_serializer_class(data=data)
+        serializer = self.input_serializer_class(data=data)
 
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            record = serializer.save()
+
+            detailed_serializer = self.output_serializer_class(record)
+            return Response(detailed_serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -80,10 +83,12 @@ class BaseAuthenticatedView(APIView):
         except self.base_model_class.DoesNotExist:
             raise NotFound(detail=f"{self.base_model_class.__name__} not found")
 
-        serializer = self.base_serializer_class(object, data=data, partial=partial)
+        serializer = self.input_serializer_class(object, data=data, partial=partial)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            record = serializer.save()
+
+            detailed_serializer = self.output_serializer_class(record)
+            return Response(detailed_serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     

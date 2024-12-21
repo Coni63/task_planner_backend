@@ -11,7 +11,8 @@ from task_manager.views.base_view import BaseAuthenticatedView
 
 
 class TaskList(BaseAuthenticatedView):
-    base_serializer_class = TaskSimpleSerializer
+    input_serializer_class = TaskSimpleSerializer
+    output_serializer_class = TaskSerializer
     base_model_class = Task
 
     def get(self, request: Request) -> Response:
@@ -20,13 +21,13 @@ class TaskList(BaseAuthenticatedView):
         """
         my_tasks = request.query_params.get("me")
         project_id = request.query_params.get("project")
-        statuses = request.query_params.getlist("status", [])
+        statuses = request.query_params.getlist("states", [])
 
         tasks = Task.objects.all()
         if my_tasks:
             tasks = tasks.filter(picked_by=request.user)
         if project_id:
-            tasks = tasks.filter(Q(project = project_id))
+            tasks = tasks.filter(project = project_id)
         if statuses:
             tasks = tasks.filter(status__state__in=statuses)
 
@@ -46,7 +47,8 @@ class TaskList(BaseAuthenticatedView):
 
 
 class TaskDetail(BaseAuthenticatedView):
-    base_serializer_class = TaskSimpleSerializer
+    input_serializer_class = TaskSimpleSerializer
+    output_serializer_class = TaskSerializer
     base_model_class = Task
 
     def get(self, request: Request, task_id: str) -> Response:
@@ -81,6 +83,7 @@ class TaskDetail(BaseAuthenticatedView):
 
 
 class TaskPickView(BaseAuthenticatedView):
+
     def get(self, request: Request) -> Response:
 
         if Task.objects.filter(picked_by=request.user).filter(status__state='active').exists():
@@ -91,7 +94,7 @@ class TaskPickView(BaseAuthenticatedView):
         next_task = Task.objects.filter(category__in=my_categories).filter(status__state='pending').order_by('order').first()
 
         if not next_task:
-            return Response({}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
         
         next_task.picked_by = request.user
         next_task.picked_at = datetime.datetime.now(datetime.timezone.utc)
