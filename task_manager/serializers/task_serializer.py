@@ -42,6 +42,7 @@ class TaskSimpleSerializer(BaseSerializer):
         # check custom constraints
         self.__check_task_not_closed(data)
         self.__check_active_state_without_picked_by(data)
+        self.__check_user_has_no_other_task(data)
 
         return data
     
@@ -58,6 +59,22 @@ class TaskSimpleSerializer(BaseSerializer):
 
         if status and status.state in ["active", "blocked", "closed"] and picked_by is None:
             raise serializers.ValidationError("Cannot set status to active, blocked, or closed without a user assigned")
+        
+    def __check_user_has_no_other_task(self, data):
+        # Cannot set a user to a task if the user is already assigned to another task
+        new_picked_by = data.get("picked_by")
+        curr_picked_by = self.instance.picked_by if self.instance else None
+
+        if new_picked_by is None:
+            return
+        
+        if new_picked_by == curr_picked_by:
+            return
+
+        # check if the user is already assigned to another task
+        tasks = Task.objects.filter(picked_by=new_picked_by).filter(status__state="active")
+        if tasks.count() > 0:
+            raise serializers.ValidationError("User is already assigned to another task")
 
 
 class TaskAuditSerializer(BaseSerializer):

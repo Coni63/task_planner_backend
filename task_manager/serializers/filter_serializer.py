@@ -1,14 +1,14 @@
 from rest_framework import serializers
-from task_manager.serializers.base_serializer import BaseSerializer
 
 
-class SearchModelSerializer(BaseSerializer):
+
+class SearchModelSerializer(serializers.Serializer):
     value = serializers.CharField(max_length=255, required=False, allow_blank=True)
     regex = serializers.BooleanField()
     fixed = serializers.ListField(child=serializers.CharField(), required=False)
 
 
-class ColumnModelSerializer(BaseSerializer):
+class ColumnModelSerializer(serializers.Serializer):
     data = serializers.CharField(max_length=255)
     name = serializers.CharField(max_length=255, required=False, allow_blank=True)
     searchable = serializers.BooleanField()
@@ -16,13 +16,13 @@ class ColumnModelSerializer(BaseSerializer):
     search = SearchModelSerializer()
 
 
-class OrderModelSerializer(BaseSerializer):
+class OrderModelSerializer(serializers.Serializer):
     column = serializers.IntegerField()
     dir = serializers.ChoiceField(choices=["asc", "desc"])
     name = serializers.CharField(max_length=255, required=False, allow_blank=True)
 
 
-class SearchRequestModelSerializer(BaseSerializer):
+class SearchRequestModelSerializer(serializers.Serializer):
     draw = serializers.IntegerField(default=0)
     columns = ColumnModelSerializer(many=True)
     order = OrderModelSerializer(many=True)
