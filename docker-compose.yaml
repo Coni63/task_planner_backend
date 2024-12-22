@@ -3,9 +3,10 @@ services:
   frontend:
     image: frontend:latest
     ports:
-      - "4200:80"
+      - "4200:4200"
     depends_on:
       - backend
+    network_mode: "host"
 
   backend:
     image: backend:latest
@@ -14,3 +15,4 @@ services:
     environment:
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=frontend,backend,localhost
+    network_mode: "host"
