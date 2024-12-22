@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+  frontend:
+    image: frontend:latest
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: backend:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - DJANGO_ALLOWED_HOSTS=frontend,backend,localhost
