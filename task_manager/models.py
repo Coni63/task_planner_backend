@@ -150,7 +150,7 @@ class Task(models.Model):
     expected_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date expected to finish this task
     reserved_for_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="reserved_for_user")
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
-    order = models.IntegerField(null=True)
+    order = models.FloatField(null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     dependencies = models.ManyToManyField("self", symmetrical=False, related_name="dependent_tasks", blank=True)

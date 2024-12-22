@@ -3,8 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.exceptions import NotFound
-from django.db.models import Q, F
-
+from django.db.models import Q, F, Max
 from task_manager.models import Status, Task, UserAssignment
 from task_manager.serializers import SearchRequestModelSerializer, TaskOrderSerializer, TaskSerializer, TaskSimpleSerializer
 from task_manager.views.base_view import BaseAuthenticatedView
@@ -45,6 +44,19 @@ class TaskList(BaseAuthenticatedView):
         """
         return self.create_object(request.data)
 
+    def on_create(self, instance, validated_data):
+        """
+        Callback for when a new task is created.
+        """
+        if not instance.order:
+            max_order = (
+                Task.objects
+                .filter(status__state__in=['active', 'pending', 'blocked'])
+                .exclude(order__isnull=True)
+                .aggregate(max_order=Max('order'))['max_order']
+            )
+            instance.order = max_order + 10 if max_order else 10
+            instance.save()
 
 class TaskDetail(BaseAuthenticatedView):
     input_serializer_class = TaskSimpleSerializer
@@ -80,6 +92,7 @@ class TaskDetail(BaseAuthenticatedView):
         Partially update a task by ID.
         """
         return self.patch_object(task_id, request.data)
+    
 
 
 class TaskPickView(BaseAuthenticatedView):
@@ -152,26 +165,3 @@ class TaskListView(BaseAuthenticatedView):
         
         return Response(response_data, status=status.HTTP_200_OK)
     
-
-
-class TaskOrderView(BaseAuthenticatedView):
-    def put(self, request, *args, **kwargs):
-        # Validate incoming data
-        serializer = TaskOrderSerializer(data=request.data, many=True)
-        serializer.is_valid(raise_exception=True)
-        
-        # Reset all task orders to null
-        Task.objects.update(order=None)  # Resets the order field for all tasks
-
-        # Update only the provided tasks with their new order
-        tasks_to_update = []
-        for task_data in serializer.validated_data:
-            task = Task.objects.get(pk=task_data['id'])
-            if task:
-                task.order = task_data['order']
-                tasks_to_update.append(task)
-        
-        # Bulk update to minimize queries
-        Task.objects.bulk_update(tasks_to_update, ['order'])
-
-        return Response({'message': 'Task order updated successfully'}, status=status.HTTP_200_OK)

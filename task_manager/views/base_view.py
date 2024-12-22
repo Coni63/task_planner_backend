@@ -56,6 +56,7 @@ class BaseAuthenticatedView(APIView):
 
         if serializer.is_valid():
             record = serializer.save()
+            self.on_create(record, serializer.validated_data)
 
             detailed_serializer = self.output_serializer_class(record)
             return Response(detailed_serializer.data, status=status.HTTP_201_CREATED)
@@ -86,6 +87,7 @@ class BaseAuthenticatedView(APIView):
         serializer = self.input_serializer_class(object, data=data, partial=partial)
         if serializer.is_valid():
             record = serializer.save()
+            self.on_update(record, serializer.validated_data)
 
             detailed_serializer = self.output_serializer_class(record)
             return Response(detailed_serializer.data, status=status.HTTP_200_OK)
@@ -97,8 +99,31 @@ class BaseAuthenticatedView(APIView):
         Delete an object by ID.
         """
         try:
-            object = self.base_model_class.objects.get(pk=object_id)
-            object.delete()
+            record = self.base_model_class.objects.get(pk=object_id)
+            record.delete()
+            self.on_delete(record)
+
             return Response(status=status.HTTP_204_NO_CONTENT)
         except self.base_model_class.DoesNotExist:
             raise NotFound(detail=f"{self.base_model_class.__name__} not found")
+
+    def on_create(self, instance, validated_data):
+        """
+        Hook to run custom logic after an object is created.
+        Override in subclasses if needed.
+        """
+        pass
+
+    def on_update(self, instance, validated_data):
+        """
+        Hook to run custom logic after an object is updated.
+        Override in subclasses if needed.
+        """
+        pass
+
+    def on_delete(self, instance):
+        """
+        Hook to run custom logic after an object is deleted.
+        Override in subclasses if needed.
+        """
+        pass
