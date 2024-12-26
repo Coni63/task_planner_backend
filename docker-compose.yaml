@@ -3,10 +3,11 @@ services:
   frontend:
     image: frontend:latest
     ports:
-      - "4200:4200"
+      - "80:80"
     depends_on:
       - backend
-    network_mode: "host"
+    networks:
+      - app-network
 
   backend:
     image: backend:latest
@@ -15,4 +16,11 @@ services:
     environment:
       - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=frontend,backend,localhost
-    network_mode: "host"
+    networks:
+      - app-network
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3  # TEMP for development
+
+networks:
+  app-network:
+    driver: bridge
