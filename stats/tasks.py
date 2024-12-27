@@ -1,5 +1,5 @@
-from django_q.tasks import schedule
-
+from django.db import ProgrammingError
+from django_q.models import Schedule
 
 def compute_stats():
     print("Computing stats...")
@@ -7,8 +7,15 @@ def compute_stats():
 
 
 def setup_periodic_tasks():
-    schedule('stats.tasks.compute_stats',
-        schedule_type='I',
-        minutes=1,
-        name='compute_stats'
-    )
+    try:
+        Schedule.objects.update_or_create(
+            name='compute_stats',
+            defaults={
+                'func': 'stats.tasks.compute_stats',
+                'schedule_type': 'I',
+                'minutes': 1,
+            }
+        )
+    except ProgrammingError as e:
+        # This catches specifically the "relation does not exist" error
+        print(f"Django Q tables not yet created: {e}")
