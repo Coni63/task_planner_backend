@@ -43,8 +43,12 @@ COPY --from=builder /app/requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy application code
-COPY task_manager /app/task_manager
-COPY task_planner /app/task_planner
+COPY core /app/core
+COPY api_v1 /app/api_v1
+COPY optimization /app/optimization
+COPY stats /app/stats
+COPY multitaskill /app/multitaskill
+COPY multitaskill /app/multitaskill
 COPY manage.py /app/manage.py
 
 # Change ownership of the application code
@@ -57,4 +61,4 @@ USER python
 EXPOSE 8000
 
 # Use gunicorn for production
-CMD ["gunicorn", "task_planner.wsgi", "--bind", "0.0.0.0:8000", "--workers", "3"]
+CMD ["gunicorn", "multitaskill.wsgi", "--bind", "0.0.0.0:8000", "--workers", "3"]
