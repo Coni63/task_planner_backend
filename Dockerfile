@@ -31,6 +31,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     libpq-dev \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -50,6 +51,7 @@ COPY stats /app/stats
 COPY multitaskill /app/multitaskill
 COPY multitaskill /app/multitaskill
 COPY manage.py /app/manage.py
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 # Change ownership of the application code
 RUN chown -R python:python /app

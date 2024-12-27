@@ -5,3 +5,4 @@ from .task_serializer import TaskSerializer, TaskSimpleSerializer, TaskAuditSeri
 from .user_assignment_serializer import UserAssignmentSerializer, UserAssignmentSimpleSerializer
 from .user_serializer import UserSerializer
 from .filter_serializer import SearchRequestModelSerializer
+from .django_q_serializer import DjangoQTaskSerializer

@@ -16,6 +16,8 @@ from .views import (
     UserAssignmentList,
     UserDetail,
     UserList,
+    OptimizerResult,
+    Optimizer,
 )
 from core.auth import CustomTokenObtainPairView, CustomTokenRefreshView, LogoutView
 from rest_framework_simplejwt.views import TokenVerifyView
@@ -44,6 +46,9 @@ urlpatterns = [
     path("tasks/<str:task_id>/", TaskDetail.as_view(), name="task-detail"),
     path("task-pick/", TaskPickView.as_view(), name="task-pick"),
     path("tasks-history/", TaskListView.as_view(), name="task-history-list"),
+
+    path("optimize/", Optimizer.as_view(), name="optimizer-view"),
+    path("optimize/<str:task_id>/", OptimizerResult.as_view(), name="optimizer-status"),
 
     # Authentication
     path('auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

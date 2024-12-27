@@ -5,7 +5,7 @@ from .status_view import StatusList, StatusDetail
 from .task_view import TaskList, TaskDetail, TaskPickView, TaskListView
 from .user_assignment_view import UserAssignmentList, UserAssignmentDetail
 from .user_view import UserList, UserDetail
-
+from .optimizer_view import Optimizer, OptimizerResult
 
 # TODO: All Users availability
 # TODO: User availability get
