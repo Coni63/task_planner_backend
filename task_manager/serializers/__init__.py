@@ -1,7 +1,0 @@
-from .category_serializer import CategorySerializer
-from .project_serializer import ProjectSerializer
-from .status_serializer import StatusSerializer
-from .task_serializer import TaskSerializer, TaskSimpleSerializer, TaskAuditSerializer, TaskOrderSerializer
-from .user_assignment_serializer import UserAssignmentSerializer, UserAssignmentSimpleSerializer
-from .user_serializer import UserSerializer
-from .filter_serializer import SearchRequestModelSerializer

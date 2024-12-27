@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Nicolas M. <mine.nicolas@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "task_planner" }]
+packages = [{ include = "multitaskill" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
