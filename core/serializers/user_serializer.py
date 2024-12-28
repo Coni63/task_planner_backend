@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import Permission
-
+from django.contrib.auth.models import Group
 from core.models import Category, CustomUser
 from .base_serializer import BaseSerializer
 from .category_serializer import CategorySerializer
@@ -14,9 +14,10 @@ class UserSerializer(BaseSerializer):
     name = serializers.CharField(source='username')
     roles = serializers.SlugRelatedField(
         many=True,
-        read_only=True,
+        read_only=False,
         slug_field='name',
-        source='groups'
+        source='groups',
+        queryset=Group.objects.all()
     )
     permissions = serializers.SerializerMethodField()
     avatar = serializers.SerializerMethodField()
