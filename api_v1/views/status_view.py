@@ -6,7 +6,7 @@ from core.models import Status
 from core.serializers import StatusSerializer
 from core.serializers.status_serializer import StatusSerializerWithTransition
 from .base_view import BaseAuthenticatedView
-
+from rest_framework import status
 
 class StatusList(BaseAuthenticatedView):
     input_serializer_class = StatusSerializer
@@ -17,7 +17,9 @@ class StatusList(BaseAuthenticatedView):
         """
         Retrieve all statuses.
         """
-        return self.get_list()
+        statuses = Status.objects.prefetch_related('transitions_from__to_status').all()
+        serializer = StatusSerializerWithTransition(statuses, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request: Request) -> Response:
         """
@@ -47,4 +49,4 @@ class StatusDetail(BaseAuthenticatedView):
         """
         Update a status by ID.
         """
-        self.update_object(status_id, request.data)
+        return self.update_object(status_id, request.data)

@@ -1,5 +1,7 @@
+import random
+import datetime
 from django.core.management.base import BaseCommand
-from core.models import Category, CustomUser, Project, Status, WorkflowTransition
+from core.models import Category, CustomUser, Project, Status, Task, WorkflowTransition
 from django.contrib.auth.models import Group
 
 class Command(BaseCommand):
@@ -12,6 +14,7 @@ class Command(BaseCommand):
         self.create_statuses()
         self.create_workflow_transitions()
         self.create_projects()
+        self.create_tasks()
 
     def create_groups(self):
         groups = ['ADMIN', 'COORDINATOR', 'MANAGER', 'MEMBER']
@@ -130,3 +133,43 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"Project created: {name} {description}"))
             else:
                 self.stdout.write(self.style.WARNING(f"Project {name} {description} already exists"))
+
+    def create_tasks(self):
+        # Retrieve or create example statuses, projects, and categories
+        status = Status.objects.filter(status="To Do").first()
+        project = Project.objects.filter(name="Project1").first()
+        categories = list(Category.objects.all())
+
+        # Clear existing tasks for a clean slate
+        Task.objects.all().delete()
+
+        # Generate tasks
+        task_references: list[Task] = []
+        for i in range(20):
+            reference = f"ABC-{str(i+1).zfill(4)}"
+            comments = f"This is a sample comment for task {reference}."
+            category = random.choice(categories)
+            estimated_duration = datetime.timedelta(days=random.randint(1, 10), hours=random.randint(0, 23))
+            expected_finalization = datetime.datetime.now(tz=datetime.timezone.utc) + estimated_duration
+
+            # Create the task
+            task = Task.objects.create(
+                reference=reference,
+                comments=comments,
+                status=status,
+                project=project,
+                estimated_duration=estimated_duration,
+                expected_finalization=expected_finalization,
+                category=category
+            )
+
+            task_references.append(task)
+
+            # Add dependencies
+            num_dependencies = random.randint(0, min(2, len(task_references)-1))
+            dependencies = random.sample(task_references[:-1], num_dependencies)
+
+            for dep in dependencies:
+                task.dependencies.add(dep)
+            
+            self.stdout.write(self.style.SUCCESS(f"Successfully create a task - {len(dependencies)} dependancies"))
