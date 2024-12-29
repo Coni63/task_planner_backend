@@ -4,12 +4,13 @@ from rest_framework.request import Request
 
 from core.models import Status
 from core.serializers import StatusSerializer
+from core.serializers.status_serializer import StatusSerializerWithTransition
 from .base_view import BaseAuthenticatedView
 
 
 class StatusList(BaseAuthenticatedView):
     input_serializer_class = StatusSerializer
-    output_serializer_class = StatusSerializer
+    output_serializer_class = StatusSerializerWithTransition
     base_model_class = Status
 
     def get(self, request: Request) -> Response:
@@ -27,7 +28,7 @@ class StatusList(BaseAuthenticatedView):
 
 class StatusDetail(BaseAuthenticatedView):
     input_serializer_class = StatusSerializer
-    output_serializer_class = StatusSerializer
+    output_serializer_class = StatusSerializerWithTransition
     base_model_class = Status
     
     def get(self, request: Request, status_id: str) -> Response:

@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from core.models import Category, CustomUser, Project, Status
+from core.models import Category, CustomUser, Project, Status, WorkflowTransition
 from django.contrib.auth.models import Group
 
 class Command(BaseCommand):
@@ -10,6 +10,7 @@ class Command(BaseCommand):
         self.create_users()
         self.create_categories()
         self.create_statuses()
+        self.create_workflow_transitions()
         self.create_projects()
 
     def create_groups(self):
@@ -81,6 +82,42 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f"Status created: {status}"))
             else:
                 self.stdout.write(self.style.WARNING(f"Status {status} already exists"))
+
+    def create_workflow_transitions(self):
+        data = [
+            ("To Do", "In Progress"),
+            ("To Do", "On Hold"),
+            ("To Do", "Not Ready"),
+            ("To Do", "Cancelled"),
+            ("In Progress", "To Do"),
+            ("In Progress", "In Review"),
+            ("In Progress", "Done"),
+            ("In Progress", "On Hold"),
+            ("In Progress", "Cancelled"),
+            ("In Review", "Done"),
+            ("In Review", "In Progress"),
+            ("In Review", "On Hold"),
+            ("In Review", "Cancelled"),
+            ("On Hold", "To Do"),
+            ("On Hold", "In Progress"),
+            ("On Hold", "In Review"),
+            ("On Hold", "Done"),
+            ("On Hold", "Cancelled"),
+            ("Not Ready", "To Do"),
+            ("Not Ready", "In Progress"),
+        ]
+
+        for from_status, to_status in data:
+            from_status = Status.objects.get(status=from_status)
+            to_status = Status.objects.get(status=to_status)
+            transition, created = WorkflowTransition.objects.get_or_create(
+                from_status=from_status, to_status=to_status
+            )
+            if created:
+                transition.save()
+                self.stdout.write(self.style.SUCCESS(f"Transition created: {from_status} -> {to_status}"))
+            else:
+                self.stdout.write(self.style.WARNING(f"Transition {from_status} -> {to_status} already exists"))
 
     def create_projects(self):
         for i in range(1, 3):
