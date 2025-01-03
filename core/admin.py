@@ -11,7 +11,7 @@ from .models import (
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
-    list_display = ("email", "first_name", "last_name", "is_member", "is_admin")
+    list_display = ("email", "first_name", "last_name")
     fieldsets = (
         (None, {"fields": ("email", "password")}),
         ("Personal Info", {"fields": ("first_name", "last_name", "username")}),
@@ -19,8 +19,6 @@ class CustomUserAdmin(UserAdmin):
             "Permissions",
             {
                 "fields": (
-                    "is_member",
-                    "is_admin",
                     "is_staff",
                     "is_active",
                     "is_superuser",

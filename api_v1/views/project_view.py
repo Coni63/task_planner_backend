@@ -27,6 +27,7 @@ class ProjectList(BaseAuthenticatedView):
 class ProjectDetail(BaseAuthenticatedView):
     input_serializer_class = ProjectSerializer
     output_serializer_class = ProjectSerializer
+    base_model_class = Project
 
     def get(self, request: Request, project_id: str) -> Response:
         """

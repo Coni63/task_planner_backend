@@ -26,7 +26,7 @@ class UserSerializer(BaseSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ("id", "name", "email", "first_name", "last_name", "is_member", "is_admin", "roles", "permissions", "avatar", "categories")
+        fields = ("id", "name", "email", "first_name", "last_name", "roles", "permissions", "avatar", "categories")
     
     def get_permissions(self, user):
         """

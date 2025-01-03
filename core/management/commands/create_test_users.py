@@ -38,15 +38,11 @@ class Command(BaseCommand):
             if created:
                 user.set_password(password)
                 if i == 0:
-                    user.is_admin = True
-                    user.is_member = True
                     user.is_superuser = True
                     user.is_staff = True
                     admin_group = Group.objects.get(name='ADMIN')
                     user.groups.add(admin_group)
                 elif i == 1:
-                    user.is_member = True
-                    user.is_admin = False
                     member_group = Group.objects.get(name='MEMBER')
                     user.groups.add(member_group)
                 user.save()
