@@ -1,7 +1,7 @@
 import random
 import datetime
 from django.core.management.base import BaseCommand
-from core.models import Category, CustomUser, Project, Status, Task, WorkflowTransition
+from core.models import Category, CustomUser, Project, Status, Task, UserAssignment, WorkflowTransition
 from django.contrib.auth.models import Group
 
 class Command(BaseCommand):
@@ -15,6 +15,7 @@ class Command(BaseCommand):
         self.create_workflow_transitions()
         self.create_projects()
         self.create_tasks()
+        self.create_user_assignments()
 
     def create_groups(self):
         groups = ['ADMIN', 'COORDINATOR', 'MANAGER', 'MEMBER']
@@ -169,3 +170,24 @@ class Command(BaseCommand):
                 task.dependencies.add(dep)
             
             self.stdout.write(self.style.SUCCESS(f"Successfully create a task - {len(dependencies)} dependancies"))
+
+    def create_user_assignments(self):
+        for i in range(0, 5):
+            if i == 0:
+                username = "admin"
+            else:
+                username = f"user{i}"
+
+            user = CustomUser.objects.filter(username=username).first()
+            categories = Category.objects.all()
+
+            for category in categories:
+                level = random.choice(["Blocked", 'Junior', 'Medior', 'Senior'])
+                try:
+                    user_assignment = UserAssignment.objects.create(
+                        user=user, category=category, level=level
+                    )
+                    user_assignment.save()
+                    self.stdout.write(self.style.SUCCESS(f"Assignment created: {username} {category.title} {level}"))
+                except:
+                    self.stdout.write(self.style.WARNING(f"Assignment {username} {category.title} already exists"))

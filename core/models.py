@@ -39,7 +39,7 @@ class UserAssignment(models.Model):
         unique_together = ("user", "category")
 
     def __str__(self):
-        return f"{self.user.username} assigned to {self.category.title} with level {self.level}"
+        return f"({self.user.username}, {self.category.title}, {self.level})"
 
 
 class ScheduleRule(models.Model):
@@ -165,7 +165,7 @@ class Task(models.Model):
     dependencies = models.ManyToManyField("self", symmetrical=False, related_name="dependent_tasks", blank=True)
 
     def __str__(self):
-        return self.reference
+        return f"Task({self.reference}, status={self.status}, project={self.project}, picked_by={self.picked_by})"
 
 
 class TaskAudit(models.Model):
