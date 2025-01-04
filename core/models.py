@@ -166,38 +166,3 @@ class Task(models.Model):
 
     def __str__(self):
         return f"Task({self.reference}, status={self.status}, project={self.project}, picked_by={self.picked_by})"
-
-
-class TaskAudit(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE)
-    status = models.ForeignKey(Status, on_delete=models.CASCADE)
-    user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE)
-    updated_at = models.DateTimeField(auto_now_add=True)
-
-
-@receiver(post_save, sender=Task)
-def create_task_audit(sender, instance: Task, created: Task, **kwargs):
-    """
-    Create a TaskAudit entry when a Task is created or its status/assigned user changes
-    """
-    # If it's a new task, create an audit entry
-    if created:
-        TaskAudit.objects.create(task=instance, status=instance.status, user=instance.picked_by)
-        return
-
-    # For existing tasks, check if status or assigned user changed
-    try:
-        # Fetch the previous version of the task from the database
-        previous_task = Task.objects.get(pk=instance.pk)
-
-        # Check if status or assigned user has changed
-        status_changed = previous_task.status != instance.status
-        user_changed = previous_task.picked_by != instance.picked_by
-
-        # Create audit entry if either status or user has changed
-        if status_changed or user_changed:
-            TaskAudit.objects.create(task=instance, status=instance.status, user=instance.picked_by)
-    except Task.DoesNotExist:
-        # This should rarely happen, but just in case
-        pass

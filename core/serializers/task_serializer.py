@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from core.models import Task, TaskAudit
+from core.models import Task
 from .base_serializer import BaseSerializer
 from .category_serializer import CategorySerializer
 from .project_serializer import ProjectSerializer
@@ -76,11 +76,6 @@ class TaskSimpleSerializer(BaseSerializer):
         if tasks.count() > 0:
             raise serializers.ValidationError("User is already assigned to another task")
 
-
-class TaskAuditSerializer(BaseSerializer):
-    class Meta:
-        model = TaskAudit
-        fields = "__all__"
 
 class TaskOrderSerializer(serializers.Serializer):
     id = serializers.UUIDField()
