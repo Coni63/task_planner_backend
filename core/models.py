@@ -157,6 +157,7 @@ class Task(models.Model):
     picked_at = models.DateTimeField(auto_now_add=False, null=True)
     estimated_duration = models.DurationField(default=datetime.timedelta(days=1))
     expected_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date expected to finish this task
+    estimated_finalization = models.DateTimeField(auto_now_add=False, null=True)  # end date planned to finish this task
     reserved_for_user = models.ForeignKey(CustomUser, null=True, on_delete=models.CASCADE, related_name="reserved_for_user")
     category = models.ForeignKey(Category, null=True, on_delete=models.CASCADE)
     order = models.FloatField(null=True)

@@ -56,6 +56,7 @@ class Gene:
     task_id: uuid.UUID
     user_id: uuid.UUID
     factor: float
+    estimated_finalization: datetime.datetime | None = None
 
 @dataclass
 class Chromosome:
@@ -70,7 +71,8 @@ class Chromosome:
             {
                 "order": order,
                 "id": gene.task_id, 
-                "reserved_for_user": gene.user_id
+                "reserved_for_user": gene.user_id,
+                "estimated_finalization": gene.estimated_finalization
             } 
             for order, gene in enumerate(self.genes, start=1)
         ]
@@ -197,6 +199,7 @@ class GeneticAlgorithm:
             end_time = start_task + duration
             user_end_times[gene.user_id] = end_time
             task_end_times[task.id] = end_time
+            gene.estimated_finalization = end_time
         
         chromosome.fitness = max(task_end_times.values())
 
