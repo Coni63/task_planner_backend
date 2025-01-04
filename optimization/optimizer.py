@@ -1,5 +1,6 @@
 from collections import defaultdict
 from dataclasses import dataclass
+import dataclasses
 import datetime
 import random
 import uuid
@@ -64,6 +65,15 @@ class Chromosome:
     def __repr__(self):
         return f"Chromosome(genes=[...], fitness={self.fitness})"
 
+    def to_json(self) -> dict:
+        return [
+            {
+                "order": order,
+                "id": gene.task_id, 
+                "reserved_for_user": gene.user_id
+            } 
+            for order, gene in enumerate(self.genes, start=1)
+        ]
 
 class GeneticAlgorithm:
     def __init__(self, tasks: dict[uuid.UUID, Task], task_user_map: dict[uuid.UUID, dict[uuid.UUID, float]]):
@@ -73,48 +83,101 @@ class GeneticAlgorithm:
 
         assert self.all_tasks_have_users(), "All tasks must have at least one user able to do it."
 
-    def run(self, *, population_size: int = 10, generations: int = 50, mutation_rate: float = 0.1) -> Chromosome:
+    def run(self, *, population_size: int = 10, generations: int = 50, mutation_rate: float = 0.1) -> dict:
         population = self._initialize_population(population_size)
         for generation in range(generations):
             print(f"Generation {generation+1}/{generations}")
 
             population = self._selection(population, population_size)
             while len(population) < population_size:
+                child = self._random_chromosome()
+                population.append(child)
+
                 parent1, parent2 = random.sample(population, 2)
                 population.extend(self._crossover(parent1, parent2))
 
                 if random.random() < mutation_rate:
                     parent = random.choice(population)
-                    population.append(self._mutate(parent))
+                    mutated = self._mutate(parent)
+                    if mutated is not None:
+                        population.append(self._mutate(parent))
+            
+            print(f"Best fitness: {min(population, key=lambda x: x.fitness).fitness}")
 
-        return min(population, key=lambda x: x.fitness)
+        winner = min(population, key=lambda x: x.fitness)
+        return winner.to_json()
 
 
     def _initialize_population(self, population_size) -> list[Chromosome]:
         population = []
         for _ in range(population_size):
-            chromosome = []
-            for task_group in self.task_depth_groups:
-                random.shuffle(task_group)
-                for task_id in task_group:
-                    possible_users = [user_id for user_id in self.task_user_map if task_id in self.task_user_map[user_id]]
-                    user_id = random.choice(possible_users)
-                    factor = self.task_user_map[user_id][task_id]
-                    chromosome.append(Gene(task_id=task_id, user_id=user_id, factor=factor))
-            c = Chromosome(chromosome)
-            self._calculate_fitness(c)
+            c = self._random_chromosome()
             population.append(c)
         return population
+    
+    def _random_chromosome(self) -> Chromosome:
+        chromosome = []
+        for task_group in self.task_depth_groups:
+            random.shuffle(task_group)
+            for task_id in task_group:
+                possible_users = [user_id for user_id in self.task_user_map if task_id in self.task_user_map[user_id]]
+                user_id = random.choice(possible_users)
+                factor = self.task_user_map[user_id][task_id]
+                chromosome.append(Gene(task_id=task_id, user_id=user_id, factor=factor))
+        c = Chromosome(chromosome)
+        self._calculate_fitness(c)
+        return c
 
     def _selection(self, population: list[Chromosome], population_size: int) -> list[Chromosome]:
         population.sort(key=lambda x: x.fitness)
         return population[:population_size // 2]
     
     def _crossover(self, parent1: Chromosome, parent2: Chromosome) -> list[Chromosome]:
-        return [parent1, parent2]
+        swapped_depths = random.randint(0, len(self.task_depth_groups)-1)
+        idx1 = sum(len(group) for group in self.task_depth_groups[:swapped_depths])
+        idx2 = idx1 + len(self.task_depth_groups[swapped_depths])
+
+        child1 = parent1.genes[:idx1] + parent2.genes[idx1:idx2] + parent1.genes[idx2:]
+        child2 = parent2.genes[:idx1] + parent1.genes[idx1:idx2] + parent2.genes[idx2:]
+        
+        c1 = Chromosome(child1)
+        c2 = Chromosome(child2)
+        self._calculate_fitness(c1)
+        self._calculate_fitness(c2)
+        return [c1, c2]
     
     def _mutate(self, parent: Chromosome) -> Chromosome:
-        return parent
+        child = dataclasses.replace(parent)  # Copy the parent chromosome
+        
+        tries = 0
+        while tries < 10:
+            case = random.randint(0, 2)
+            if case == 0:
+                # Change user
+                gene_idx = random.randint(0, len(child.genes)-1)
+                initial_gene = child.genes[gene_idx]
+                possible_users = [user_id for user_id in self.task_user_map if initial_gene.task_id in self.task_user_map[user_id] and user_id != initial_gene.user_id]
+                if len(possible_users) > 0:
+                    user_id = random.choice(possible_users)
+                    factor = self.task_user_map[user_id][initial_gene.task_id]
+                    child.genes[gene_idx] = Gene(task_id=initial_gene.task_id, user_id=user_id, factor=factor)
+                    self._calculate_fitness(child)
+                    return child
+            else:
+                # Swap genes
+                possible_depths = [i for i in range(len(self.task_depth_groups)) if len(self.task_depth_groups[i]) > 1]
+                if len(possible_depths) > 0:
+                    swapped_depths = random.choice(possible_depths)
+                    start = sum(len(group) for group in self.task_depth_groups[:swapped_depths])
+                    end = start + len(self.task_depth_groups[swapped_depths])
+
+                    idx1, idx2 = random.sample(range(start, end), 2)
+                    child.genes[idx1], child.genes[idx2] = child.genes[idx2], child.genes[idx1]
+                    self._calculate_fitness(child)
+                    return child
+            tries += 1
+        return None
+
 
     def _calculate_fitness(self, chromosome: Chromosome) -> float:
         user_end_times: dict[uuid.UUID, datetime.datetime] = {}
@@ -149,3 +212,4 @@ class GeneticAlgorithm:
             if not any(task.id in user_tasks for user_tasks in self.task_user_map.values()):
                 return False
         return True
+    

@@ -1,6 +1,7 @@
 import uuid
 
 from core.models import Task, UserAssignment
+from core.serializers.task_serializer import TaskSerializer, TaskSimpleSerializer
 from optimization.optimizer import GeneticAlgorithm
 
 def optimize(data):
@@ -29,7 +30,9 @@ def optimize(data):
             task_user_map[user][task_id] = factors[user][task.category.id]
 
     solver = GeneticAlgorithm(tasks, task_user_map)
-    solution = solver.run(generations=0)
+    solution = solver.run(generations=100)
+
+    patch_tasks(solution)
     
 
 
@@ -73,3 +76,25 @@ def check_dependencies(data):
     dfs(root_task, visited, recursion_stack)
 
     return
+
+
+
+from rest_framework.exceptions import ValidationError
+
+def patch_tasks(data: list[dict]):
+    """
+    Patch tasks based on a list of dictionaries.
+    Each dictionary should have keys 'id', 'order', and 'reservedForUser'.
+    """
+    for item in data:
+        try:
+            task = Task.objects.get(id=item["id"])
+            serializer = TaskSimpleSerializer(
+                task,
+                data=item,
+                partial=True,
+            )
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+        except Task.DoesNotExist:
+            raise ValidationError({"error": f"Task with id {item['id']} not found."})
