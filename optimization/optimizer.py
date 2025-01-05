@@ -56,6 +56,7 @@ class Gene:
     task_id: uuid.UUID
     user_id: uuid.UUID
     factor: float
+    estimated_picked_at: datetime.datetime | None = None
     estimated_finalization: datetime.datetime | None = None
 
 @dataclass
@@ -72,7 +73,8 @@ class Chromosome:
                 "order": order,
                 "id": gene.task_id, 
                 "reserved_for_user": gene.user_id,
-                "estimated_finalization": gene.estimated_finalization
+                "estimated_finalization": gene.estimated_finalization,
+                "estimated_picked_at": gene.estimated_picked_at,
             } 
             for order, gene in enumerate(self.genes, start=1)
         ]
@@ -107,6 +109,7 @@ class GeneticAlgorithm:
             print(f"Best fitness: {min(population, key=lambda x: x.fitness).fitness}")
 
         winner = min(population, key=lambda x: x.fitness)
+        winner.genes.sort(key=lambda x: x.estimated_finalization)
         return winner.to_json()
 
 
@@ -199,6 +202,8 @@ class GeneticAlgorithm:
             end_time = start_task + duration
             user_end_times[gene.user_id] = end_time
             task_end_times[task.id] = end_time
+            
+            gene.estimated_picked_at = start_task
             gene.estimated_finalization = end_time
         
         chromosome.fitness = max(task_end_times.values())
