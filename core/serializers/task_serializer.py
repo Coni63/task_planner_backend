@@ -13,21 +13,17 @@ class TaskSerializer(BaseSerializer):
     project = ProjectSerializer(read_only=True)
     picked_by = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
-    estimated_finalization = serializers.SerializerMethodField()
+    reserved_for_user = UserSerializer(read_only=True)
     at_risk = serializers.SerializerMethodField()
     
     class Meta:
         model = Task
         fields = "__all__"
 
-    def get_estimated_finalization(self, task):
-        return task.expected_finalization  # TODO: real computation
-    
-    def get_at_risk(self, task):
-        estimated_finalization = self.get_estimated_finalization(task)
-        if estimated_finalization is None or estimated_finalization is None:
+    def get_at_risk(self, task: Task):
+        if task.estimated_finalization is None or task.expected_finalization is None:
             return False
-        return self.get_estimated_finalization(task) > task.expected_finalization
+        return task.estimated_finalization > task.expected_finalization
 
 
 class TaskSimpleSerializer(BaseSerializer):
@@ -75,8 +71,3 @@ class TaskSimpleSerializer(BaseSerializer):
         tasks = Task.objects.filter(picked_by=new_picked_by).filter(status__state="active")
         if tasks.count() > 0:
             raise serializers.ValidationError("User is already assigned to another task")
-
-
-class TaskOrderSerializer(serializers.Serializer):
-    id = serializers.UUIDField()
-    order = serializers.IntegerField(allow_null=True)

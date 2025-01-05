@@ -9,7 +9,7 @@ class IsAdminUser(permissions.BasePermission):
     def has_permission(self, request, view):
         # Check if the user is authenticated and has is_admin set to True
         return (request.user and request.user.is_authenticated 
-                and getattr(request.user, 'is_admin', False))
+                and "ADMIN" in [group.name for group in request.user.groups.all()])
     
 class IsActiveUser(permissions.BasePermission):
     """

@@ -22,7 +22,7 @@ class TaskList(BaseAuthenticatedView):
         project_id = request.query_params.get("project")
         statuses = request.query_params.getlist("states", [])
 
-        tasks = Task.objects.all()
+        tasks = Task.objects.all().prefetch_related('status', 'project', 'picked_by', 'category', 'reserved_for_user')
         if my_tasks:
             tasks = tasks.filter(picked_by=request.user)
         if project_id:
