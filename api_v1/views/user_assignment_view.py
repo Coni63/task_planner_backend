@@ -1,59 +1,39 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.request import Request
+from rest_framework import generics
 
+from api_v1.permissions import CanCreateUserAssignment, CanDeleteUserAssignment, CanReadUserAssignment, CanUpdateUserAssignment
 from core.models import UserAssignment
-from core.serializers import UserAssignmentSerializer, UserAssignmentSimpleSerializer
-from .base_view import BaseAuthenticatedView
+from api_v1.serializers import UserAssignmentSerializer, UserAssignmentSimpleSerializer
 
 
-class UserAssignmentList(BaseAuthenticatedView):
-    input_serializer_class = UserAssignmentSimpleSerializer
-    output_serializer_class = UserAssignmentSerializer
-    base_model_class = UserAssignment
+class UserAssignmentList(generics.ListCreateAPIView):
+    serializer_class = UserAssignmentSerializer
 
-    def get(self, request: Request) -> Response:
-        """
-        Retrieve all user assignments or for a single user (by id with query param 'user')
-        """
-        user_id = request.query_params.get("user")
+    def get_queryset(self):
+        """Filter by user ID if provided."""
+        user_id = self.request.query_params.get("user")
         if user_id:
-            user_assignments = UserAssignment.objects.filter(user=user_id)
-        else:
-            user_assignments = UserAssignment.objects.all()
+            return self.queryset.filter(user=user_id)
+        return UserAssignment.objects.all()
 
-        if not user_assignments.exists():
-            return Response([], status=status.HTTP_200_OK)
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadUserAssignment]
+        elif self.request.method == 'POST':
+            self.permission_classes = [CanCreateUserAssignment]
 
-        serializer = UserAssignmentSerializer(user_assignments, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request: Request) -> Response:
-        """
-        Create a new user assignment.
-        """
-        return self.create_object(request.data)
+        return super(UserAssignmentList, self).get_permissions()
 
 
-class UserAssignmentDetail(BaseAuthenticatedView):
-    input_serializer_class = UserAssignmentSimpleSerializer
-    output_serializer_class = UserAssignmentSerializer
-    base_model_class = UserAssignment
+class UserAssignmentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = UserAssignment.objects.all()
+    serializer_class = UserAssignmentSerializer
 
-    def get(self, request: Request, assignment_id: str) -> Response:
-        """
-        Get a single user assignment by id.
-        """
-        return self.get_object(assignment_id)
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadUserAssignment]
+        elif self.request.method == 'DELETE':
+            self.permission_classes = [CanDeleteUserAssignment]
+        elif self.request.method in ['PUT', 'PATCH']:
+            self.permission_classes = [CanUpdateUserAssignment]
 
-    def delete(self, request: Request, assignment_id: str) -> Response:
-        """
-        Delete a user assignment by id.
-        """
-        return self.delete_object(assignment_id)
-
-    def put(self, request: Request, assignment_id: str) -> Response:
-        """
-        Update a user assignment by id.
-        """
-        return self.update_object(assignment_id, request.data)
+        return super(UserAssignmentDetail, self).get_permissions()

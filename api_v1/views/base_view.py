@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 from django.db.models import Model
 
-from core.permissions import CustomJWTAuthentication, IsActiveUser, IsAdminUser
+from api_v1.permissions import CustomJWTAuthentication, IsActiveUser
 
 
 class BaseAuthenticatedView(APIView):
@@ -23,7 +23,7 @@ class BaseAuthenticatedView(APIView):
         if self.request.method == "GET":
             return [IsActiveUser()]
         else:
-            return [IsAdminUser()]
+            return [IsActiveUser()]
 
     def get_list(self):
         """

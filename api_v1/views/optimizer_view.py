@@ -1,19 +1,23 @@
 from rest_framework.response import Response
 from rest_framework.request import Request
+from rest_framework import views
 from django_q.tasks import async_task, fetch
 
-from core.serializers.django_q_serializer import DjangoQTaskSerializer
+from api_v1.permissions import CanCreateOrmQ, CanReadOrmQ
+from api_v1.serializers.django_q_serializer import DjangoQTaskSerializer
 
-from .base_view import BaseAuthenticatedView
 
+class Optimizer(views.APIView):
+    permission_classes = [CanCreateOrmQ]
 
-class Optimizer(BaseAuthenticatedView):
     def post(self, request: Request) -> Response:
         task_id = async_task('optimization.services.optimize', request.data)
         return Response({"task_id": task_id})
 
 
-class OptimizerResult(BaseAuthenticatedView):
+class OptimizerResult(views.APIView):
+    permission_classes = [CanReadOrmQ]
+
     def get(self, request: Request, task_id: str) -> Response:
         task = fetch(task_id)
         return Response(DjangoQTaskSerializer(task).data)

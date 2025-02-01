@@ -1,48 +1,31 @@
-from rest_framework.response import Response
-from rest_framework.request import Request
-
+from rest_framework import generics
+from api_v1.permissions import CanCreateProject, CanDeleteProject, CanReadProject, CanUpdateProject
 from core.models import Project
-from core.serializers import ProjectSerializer
-from .base_view import BaseAuthenticatedView
+from api_v1.serializers import ProjectSerializer
 
 
-class ProjectList(BaseAuthenticatedView):
-    input_serializer_class = ProjectSerializer
-    output_serializer_class = ProjectSerializer
-    base_model_class = Project
+class ProjectList(generics.ListCreateAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
-    def get(self, request: Request) -> Response:
-        """	
-        Retrieve all projects.
-        """
-        return self.get_list()
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadProject]
+        elif self.request.method == 'POST':
+            self.permission_classes = [CanCreateProject]
 
-    def post(self, request: Request) -> Response:
-        """
-        Create a new project.
-        """
-        return self.create_object(request.data)
+        return super(ProjectList, self).get_permissions()
+    
 
+class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadProject]
+        elif self.request.method == 'DELETE':
+            self.permission_classes = [CanDeleteProject]
+        elif self.request.method in ['PUT', 'PATCH']:
+            self.permission_classes = [CanUpdateProject]
 
-class ProjectDetail(BaseAuthenticatedView):
-    input_serializer_class = ProjectSerializer
-    output_serializer_class = ProjectSerializer
-    base_model_class = Project
-
-    def get(self, request: Request, project_id: str) -> Response:
-        """
-        Retrieve a single project by ID.
-        """
-        return self.get_object(project_id)
-
-    def delete(self, request: Request, project_id: str):
-        """
-        Delete a project by ID.
-        """
-        return self.delete_object(project_id)
-
-    def put(self, request: Request, project_id: str):
-        """
-        Update a project by ID.
-        """
-        return self.update_object(project_id, request.data)
+        return super(ProjectDetail, self).get_permissions()

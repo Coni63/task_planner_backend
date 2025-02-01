@@ -5,7 +5,7 @@ from rest_framework.request import Request
 from rest_framework.exceptions import NotFound
 from django.db.models import Q, F, Max
 from core.models import Status, Task, UserAssignment
-from core.serializers import SearchRequestModelSerializer, TaskSerializer, TaskSimpleSerializer
+from api_v1.serializers import SearchRequestModelSerializer, TaskSerializer, TaskSimpleSerializer
 from .base_view import BaseAuthenticatedView
 
 

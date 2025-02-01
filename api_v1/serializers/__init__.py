@@ -1,6 +1,6 @@
 from .category_serializer import CategorySerializer
 from .project_serializer import ProjectSerializer
-from .status_serializer import StatusSerializer
+from .status_serializer import StatusSerializer, StatusSerializerWithTransition
 from .task_serializer import TaskSerializer, TaskSimpleSerializer
 from .user_assignment_serializer import UserAssignmentSerializer, UserAssignmentSimpleSerializer
 from .user_serializer import UserSerializer

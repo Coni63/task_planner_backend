@@ -1,6 +1,6 @@
 
 from core.models import Status, WorkflowTransition
-from core.serializers.base_serializer import BaseSerializer
+from api_v1.serializers.base_serializer import BaseSerializer
 from rest_framework import serializers
 
 class StatusSerializer(BaseSerializer):

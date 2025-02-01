@@ -1,7 +1,7 @@
 import uuid
 
 from core.models import Task, UserAssignment
-from core.serializers.task_serializer import TaskSerializer, TaskSimpleSerializer
+from api_v1.serializers.task_serializer import TaskSerializer, TaskSimpleSerializer
 from optimization.optimizer import GeneticAlgorithm
 
 def optimize(data):

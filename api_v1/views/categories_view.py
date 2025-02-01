@@ -1,43 +1,33 @@
-from rest_framework.response import Response
-from rest_framework.request import Request
+from rest_framework import generics
 
 from core.models import Category
-from core.serializers import CategorySerializer
-from .base_view import BaseAuthenticatedView
+from api_v1.permissions import CanCreateCategories, CanDeleteCategories, CanReadCategories, CanUpdateCategories
+from api_v1.serializers import CategorySerializer
 
 
+class CategoryList(generics.ListCreateAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-class CategoryList(BaseAuthenticatedView):
-    input_serializer_class = CategorySerializer
-    output_serializer_class = CategorySerializer
-    base_model_class = Category
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadCategories]
+        elif self.request.method == 'POST':
+            self.permission_classes = [CanCreateCategories]
 
-    def get(self, request: Request) -> Response:
-        """
-        Retrieve all categories.
-        """
-        return self.get_list()
-
-    def post(self, request: Request) -> Response:
-        """
-        Create a new category.
-        """
-        return self.create_object(request.data)
+        return super(CategoryList, self).get_permissions()
 
 
-class CategoryDetail(BaseAuthenticatedView):
-    input_serializer_class = CategorySerializer
-    output_serializer_class = CategorySerializer
+class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
-    def delete(self, request: Request, category_id: str) -> Response:
-        """
-        Delete a category by ID.
-        """
-        return self.delete_object(category_id)
-        
-    def put(self, request: Request, category_id: str) -> Response:
-        """
-        Update a category by ID.
-        """
-        return self.update_object(category_id, request.data)
-    
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadCategories]
+        elif self.request.method == 'DELETE':
+            self.permission_classes = [CanDeleteCategories]
+        elif self.request.method in ['PUT', 'PATCH']:
+            self.permission_classes = [CanUpdateCategories]
+
+        return super(CategoryDetail, self).get_permissions()

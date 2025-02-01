@@ -1,5 +1,5 @@
 from core.models import Category
-from core.serializers.base_serializer import BaseSerializer
+from api_v1.serializers.base_serializer import BaseSerializer
 
 
 class CategorySerializer(BaseSerializer):
