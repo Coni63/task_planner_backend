@@ -122,6 +122,10 @@ class CanCreateTask(permissions.BasePermission):
     def has_permission(self, request, view):
         return _is_authenticated(request) and _has_group(request, 'add_task')
 
+class CanPickTask(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return _is_authenticated(request) and _has_group(request, 'pick_task')
+
 '''
 UserAssignment Permissions
 '''

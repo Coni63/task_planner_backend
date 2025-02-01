@@ -1,124 +1,81 @@
 import datetime
-from rest_framework import status
+from rest_framework import status, generics, views
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework.exceptions import NotFound
 from django.db.models import Q, F, Max
+from api_v1.permissions import CanCreateTask, CanDeleteTask, CanPickTask, CanReadTask, CanUpdateTask
 from core.models import Status, Task, UserAssignment
 from api_v1.serializers import SearchRequestModelSerializer, TaskSerializer, TaskSimpleSerializer
-from .base_view import BaseAuthenticatedView
+from django_filters import rest_framework as filters
 
 
-class TaskList(BaseAuthenticatedView):
-    input_serializer_class = TaskSimpleSerializer
-    output_serializer_class = TaskSerializer
-    base_model_class = Task
+class TaskFilter(filters.FilterSet):
+    class Meta:
+        model = Task
+        fields = ['project', 'picked_by']
+
+
+class TaskList(generics.ListCreateAPIView):
+    queryset = Task.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = TaskFilter
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadTask]
+        elif self.request.method == 'POST':
+            self.permission_classes = [CanCreateTask]
+
+        return super(TaskList, self).get_permissions()
+    
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return TaskSerializer
+        elif self.request.method == 'POST':
+            return TaskSimpleSerializer
+        
+    def perform_create(self, serializer):
+        task = Task.objects.create_task(**serializer.validated_data)
+        serializer.instance = task  # Attach the created instance
+
+
+class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            self.permission_classes = [CanReadTask]
+        elif self.request.method == 'DELETE':
+            self.permission_classes = [CanDeleteTask]
+        elif self.request.method in ['PUT', 'PATCH']:
+            self.permission_classes = [CanUpdateTask]
+
+        return super(TaskDetail, self).get_permissions()
+
+
+
+class TaskPickView(views.APIView):
+    """
+    Event trigger when a user ask for a new task
+    """
+    authentication_classes = [CanPickTask]
 
     def get(self, request: Request) -> Response:
-        """
-        Retrieve all tasks or for a single project (by id with query param 'project')
-        """
-        my_tasks = request.query_params.get("me")
-        project_id = request.query_params.get("project")
-        statuses = request.query_params.getlist("states", [])
-
-        tasks = Task.objects.all().prefetch_related('status', 'project', 'picked_by', 'category', 'reserved_for_user')
-        if my_tasks:
-            tasks = tasks.filter(picked_by=request.user)
-        if project_id:
-            tasks = tasks.filter(project = project_id)
-        if statuses:
-            tasks = tasks.filter(status__state__in=statuses)
-
-        if not tasks.exists():
-            return Response([], status=status.HTTP_200_OK)
-
-        tasks = tasks.order_by(F('order').asc(nulls_last=True), 'created_at')
-
-        serializer = TaskSerializer(tasks, many=True)
-        return Response(serializer.data)
-
-    def post(self, request: Request) -> Response:
-        """
-        Create a new task.
-        """
-        return self.create_object(request.data)
-
-    def on_create(self, instance, validated_data):
-        """
-        Callback for when a new task is created.
-        """
-        if not instance.order:
-            max_order = (
-                Task.objects
-                .filter(status__state__in=['active', 'pending', 'blocked'])
-                .exclude(order__isnull=True)
-                .aggregate(max_order=Max('order'))['max_order']
-            )
-            instance.order = max_order + 10 if max_order else 10
-            instance.save()
-
-class TaskDetail(BaseAuthenticatedView):
-    input_serializer_class = TaskSimpleSerializer
-    output_serializer_class = TaskSerializer
-    base_model_class = Task
-
-    def get(self, request: Request, task_id: str) -> Response:
-        """
-        Retrieve a single task by ID.
-        """
-        try:
-            task = Task.objects.get(pk=task_id)
-        except Task.DoesNotExist:
-            raise NotFound(detail="Task not found")
-
-        serializer = TaskSerializer(task)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def delete(self, request: Request, task_id: str) -> Response:
-        """
-        Delete a task by ID.
-        """
-        return self.delete_object(task_id)
-
-    def put(self, request: Request, task_id: str) -> Response:
-        """
-        Update a task by ID.
-        """
-        return self.update_object(task_id, request.data)
-    
-    def patch(self, request, task_id: str) -> Response:
-        """
-        Partially update a task by ID.
-        """
-        return self.patch_object(task_id, request.data)
-    
-
-
-class TaskPickView(BaseAuthenticatedView):
-
-    def get(self, request: Request) -> Response:
-
-        if Task.objects.filter(picked_by=request.user).filter(status__state='active').exists():
+        if Task.objects.get_user_active_tasks(request.user).exists():
             return Response({"error": "User already has an active task"}, status=status.HTTP_412_PRECONDITION_FAILED)
 
-        my_categories = UserAssignment.objects.filter(user=request.user).filter(~Q(level="Blocked")).values_list('category', flat=True)
-
-        next_task = Task.objects.filter(category__in=my_categories).filter(status__state='pending').order_by('order').first()
+        my_categories = UserAssignment.objects.get_user_assignments(request.user)
+        next_task = Task.objects.pick_next_task(request.user, my_categories)
 
         if not next_task:
             return Response(status=status.HTTP_200_OK)
-        
-        next_task.picked_by = request.user
-        next_task.picked_at = datetime.datetime.now(datetime.timezone.utc)
-        next_task.status = Status.objects.get(status='In Progress')
-        next_task.save()
 
-        serializer = TaskSerializer(next_task)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(TaskSerializer(next_task).data, status=status.HTTP_200_OK)
     
 
-class TaskListView(BaseAuthenticatedView):
+class TaskListView(views.APIView):
     def post(self, request, *args, **kwargs):
         serializer = SearchRequestModelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

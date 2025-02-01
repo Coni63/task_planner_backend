@@ -21,22 +21,44 @@ class TaskQuerySet(models.QuerySet):
     
     def sorted(self):
         return self.order_by(F('order').asc(nulls_last=True), 'created_at')
+    
+    def in_state(self, state):
+        return self.filter(status__state=state)
+    
+    def in_categories(self, categories):
+        return self.filter(category__in=categories)
 
 
 class TaskManager(models.Manager):
     def get_queryset(self):
         return TaskQuerySet(self.model, using=self._db)
     
-    def create_task(self, instance):
-        if not instance.order:
-            max_order = (
-                Task.objects
-                .filter(status__state__in=['active', 'pending', 'blocked'])
-                .exclude(order__isnull=True)
-                .aggregate(max_order=Max('order'))['max_order']
-            )
-            instance.order = max_order + 10 if max_order else 10
-        instance.save()
+    def create_task(self, **kwargs):
+        max_order = (
+            Task.objects
+            .filter(status__state__in=['active', 'pending', 'blocked'])
+            .exclude(order__isnull=True)
+            .aggregate(max_order=Max('order'))['max_order']
+        )
+        kwargs["order"] = max_order + 10 if max_order else 10
+
+        return self.create(**kwargs)
+
+    def get_user_active_tasks(self, user):
+        return self.get_queryset().assign_to(user).in_state('active')
+    
+    def pick_next_task(self, user, categories):
+        next_task = self.get_queryset().in_categories(categories).in_state('pending').order_by('order').first()
+
+        if not next_task:
+            return None
+        
+        next_task.picked_by = user
+        next_task.picked_at = datetime.datetime.now(datetime.timezone.utc)
+        next_task.status = Status.objects.get(status='In Progress')
+        next_task.save()
+
+        return next_task
 
 
 class Task(models.Model):
@@ -59,7 +81,12 @@ class Task(models.Model):
 
     dependencies = models.ManyToManyField("self", symmetrical=False, related_name="dependent_tasks", blank=True)
 
-    objects = TaskManager()
+    objects: TaskManager = TaskManager()
+
+    class Meta:
+        permissions = [
+            ("pick_task", "The user is allowed to pick a new task")
+        ]
 
     def __str__(self):
         return f"Task({self.reference}, status={self.status}, project={self.project}, picked_by={self.picked_by})"
