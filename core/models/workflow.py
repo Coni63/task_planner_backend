@@ -1,28 +1,12 @@
-
 import uuid
 from django.db import models
-
-from core.models.status import Status
-
-
-class WorkflowQuerySet(models.QuerySet):
-    pass
-
-
-class WorkflowManager(models.Manager):
-    def get_queryset(self):
-        return WorkflowQuerySet(self.model, using=self._db)
-
-
 
 
 class WorkflowTransition(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100, blank=True, null=True)  # Optional for a name like "Standard Transition"
-    from_status = models.ForeignKey(Status, related_name='transitions_from', on_delete=models.CASCADE)
-    to_status = models.ForeignKey(Status, related_name='transitions_to', on_delete=models.CASCADE)
-
-    objects = WorkflowManager()
+    from_status = models.ForeignKey('Status', related_name='transitions_from', on_delete=models.CASCADE)
+    to_status = models.ForeignKey('Status', related_name='transitions_to', on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.from_status.status} → {self.to_status.status}"

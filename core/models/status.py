@@ -23,3 +23,10 @@ class Status(models.Model):
 
     def __str__(self):
         return self.status
+
+    def can_transition_to(self, next_status):
+        from core.models.workflow import WorkflowTransition
+
+        return WorkflowTransition.objects.filter(
+            from_status=self, to_status=next_status
+        ).exists()

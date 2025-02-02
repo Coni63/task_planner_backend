@@ -3,17 +3,18 @@ from rest_framework import generics
 from api_v1.permissions import CanCreateUserAssignment, CanDeleteUserAssignment, CanReadUserAssignment, CanUpdateUserAssignment
 from core.models import UserAssignment
 from api_v1.serializers import UserAssignmentSerializer, UserAssignmentSimpleSerializer
+from django_filters import rest_framework as filters
 
+class UserAssignmentFilter(filters.FilterSet):
+    class Meta:
+        model = UserAssignment
+        fields = ['user']
 
 class UserAssignmentList(generics.ListCreateAPIView):
+    queryset = UserAssignment.objects.all()
     serializer_class = UserAssignmentSerializer
-
-    def get_queryset(self):
-        """Filter by user ID if provided."""
-        user_id = self.request.query_params.get("user")
-        if user_id:
-            return self.queryset.filter(user=user_id)
-        return UserAssignment.objects.all()
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = UserAssignmentFilter
 
     def get_permissions(self):
         if self.request.method == 'GET':

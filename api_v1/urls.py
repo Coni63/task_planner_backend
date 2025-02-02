@@ -2,6 +2,7 @@ import uuid
 from django.urls import path, register_converter
 
 from api_v1.views.user_view import MyselfDetail
+from api_v1.views.workflow_view import WorkflowTransitionDetail, WorkflowTransitionList
 
 from .views.menu_view import MenuView
 from .views import (
@@ -43,28 +44,31 @@ urlpatterns = [
     path("menu/", MenuView.as_view(), name="menu-view"),
 
     path("users/", UserList.as_view(), name="user-list"),
-    path("users/<uuid:user_id>/", UserDetail.as_view(), name="user-detail"),
+    path("users/<uuid:pk>/", UserDetail.as_view(), name="user-detail"),
     path("users/me/", MyselfDetail.as_view(), name="myself-detail"),
 
     path("categories/", CategoryList.as_view(), name="category-list"),
-    path("categories/<uuid:category_id>/", CategoryDetail.as_view(), name="category-detail"),
+    path("categories/<uuid:pk>/", CategoryDetail.as_view(), name="category-detail"),
 
     path("user-assignement/", UserAssignmentList.as_view(), name="user-assignement-list"),
-    path("user-assignement/<uuid:assignment_id>/", UserAssignmentDetail.as_view(), name="user-assignement-detail"),
+    path("user-assignement/<uuid:pk>/", UserAssignmentDetail.as_view(), name="user-assignement-detail"),
     
     path("projects/", ProjectList.as_view(), name="project-list"),
-    path("projects/<uuid:project_id>/", ProjectDetail.as_view(), name="project-detail"),
+    path("projects/<uuid:pk>/", ProjectDetail.as_view(), name="project-detail"),
     
     path("status/", StatusList.as_view(), name="status-list"),
-    path("status/<uuid:status_id>/", StatusDetail.as_view(), name="status-detail"),
+    path("status/<uuid:pk>/", StatusDetail.as_view(), name="status-detail"),
+    
+    path("workflow/", WorkflowTransitionList.as_view(), name="workflow-list"),
+    path("workflow/<uuid:pk>/", WorkflowTransitionDetail.as_view(), name="workflow-detail"),
     
     path("tasks/", TaskList.as_view(), name="task-list"),
-    path("tasks/<uuid:task_id>/", TaskDetail.as_view(), name="task-detail"),
+    path("tasks/<uuid:pk>/", TaskDetail.as_view(), name="task-detail"),
     path("task-pick/", TaskPickView.as_view(), name="task-pick"),
     path("tasks-history/", TaskListView.as_view(), name="task-history-list"),
 
     path("optimize/", Optimizer.as_view(), name="optimizer-view"),
-    path("optimize/<str:task_id>/", OptimizerResult.as_view(), name="optimizer-status"),
+    path("optimize/<str:pk>/", OptimizerResult.as_view(), name="optimizer-status"),
 
     # Authentication
     path('auth/token/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),

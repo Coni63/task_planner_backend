@@ -36,7 +36,7 @@ class UserDetail(generics.RetrieveUpdateAPIView):
         return super(UserDetail, self).get_permissions()
     
     def get_object(self):
-        user_id = self.kwargs.get('user_id')
+        user_id = self.kwargs.get('pk')
         
         user = get_object_or_404(CustomUser, pk=user_id)
         self.check_object_permissions(self.request, user)

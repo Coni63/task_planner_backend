@@ -18,6 +18,8 @@ class Optimizer(views.APIView):
 class OptimizerResult(views.APIView):
     permission_classes = [CanReadOrmQ]
 
-    def get(self, request: Request, task_id: str) -> Response:
-        task = fetch(task_id)
+    def get(self, request: Request, pk: str) -> Response:
+        task = fetch(pk)
+        if not task:
+            return Response({})
         return Response(DjangoQTaskSerializer(task).data)

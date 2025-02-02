@@ -6,3 +6,4 @@ from .user_assignment_serializer import UserAssignmentSerializer, UserAssignment
 from .user_serializer import UserSerializer
 from .filter_serializer import SearchRequestModelSerializer
 from .django_q_serializer import DjangoQTaskSerializer
+from .workflow_serializer import WorkflowTransitionSerializer
