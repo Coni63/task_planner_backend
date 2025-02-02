@@ -14,5 +14,6 @@ class MenuView(views.APIView):
         Retrieve the current user's menu.
         """
         from core.menu import menu
+
         # TODO: Add badges values
         return Response(menu, status=status.HTTP_200_OK)

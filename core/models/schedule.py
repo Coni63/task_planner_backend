@@ -1,4 +1,3 @@
-
 import uuid
 from django.db import models
 
@@ -9,6 +8,7 @@ class ScheduleRule(models.Model):
     """
     Defines recurring schedule rules for a user.
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="schedule_rules")
     day_of_week = models.IntegerField(
@@ -44,6 +44,7 @@ class ScheduleOverride(models.Model):
     """
     Defines exceptions to the regular schedule for a specific user and date.
     """
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="schedule_overrides")
     date = models.DateField(help_text="Specific date for the override")

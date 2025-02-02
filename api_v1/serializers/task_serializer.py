@@ -15,7 +15,7 @@ class TaskSerializer(BaseSerializer):
     category = CategorySerializer(read_only=True)
     reserved_for_user = UserSerializer(read_only=True)
     at_risk = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Task
         fields = "__all__"
@@ -41,7 +41,7 @@ class TaskSimpleSerializer(BaseSerializer):
         self.__check_user_has_no_other_task(data)
 
         return data
-    
+
     def __check_task_not_closed(self, data):
         # Even an admin cannot modified a closed task
         task = self.instance
@@ -55,7 +55,7 @@ class TaskSimpleSerializer(BaseSerializer):
 
         if status and status.state in ["active", "blocked", "closed"] and picked_by is None:
             raise serializers.ValidationError("Cannot set status to active, blocked, or closed without a user assigned")
-        
+
     def __check_user_has_no_other_task(self, data):
         # Cannot set a user to a task if the user is already assigned to another task
         new_picked_by = data.get("picked_by")
@@ -63,7 +63,7 @@ class TaskSimpleSerializer(BaseSerializer):
 
         if new_picked_by is None:
             return
-        
+
         if new_picked_by == curr_picked_by:
             return
 

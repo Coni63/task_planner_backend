@@ -10,9 +10,9 @@ class StatusList(generics.ListCreateAPIView):
     serializer_class = StatusSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             self.permission_classes = [CanReadStatus]
-        elif self.request.method == 'POST':
+        elif self.request.method == "POST":
             self.permission_classes = [CanCreateStatus]
 
         return super(StatusList, self).get_permissions()
@@ -23,11 +23,11 @@ class StatusDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = StatusSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             self.permission_classes = [CanReadStatus]
-        elif self.request.method == 'DELETE':
+        elif self.request.method == "DELETE":
             self.permission_classes = [CanDeleteStatus]
-        elif self.request.method in ['PUT', 'PATCH']:
+        elif self.request.method in ["PUT", "PATCH"]:
             self.permission_classes = [CanUpdateStatus]
 
         return super(StatusDetail, self).get_permissions()

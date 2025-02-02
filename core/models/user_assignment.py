@@ -1,13 +1,14 @@
 import uuid
 from django.db import models
-from django.db.models import Q, F, Max
+from django.db.models import Q
 from core.models.custom_user import CustomUser
 from core.models.category import Category
 
+
 class UserAssignmentQuerySet(models.QuerySet):
     def assign_to(self, user):
-        return self.filter(user = user)
-    
+        return self.filter(user=user)
+
     def not_blocked(self):
         return self.filter(~Q(level="Blocked"))
 
@@ -17,7 +18,8 @@ class UserAssignmentManager(models.Manager):
         return UserAssignmentQuerySet(self.model, using=self._db)
 
     def get_user_assignments(self, user):
-        return self.get_queryset().assign_to(user).not_blocked().values_list('category', flat=True)
+        return self.get_queryset().assign_to(user).not_blocked().values_list("category", flat=True)
+
 
 class UserAssignment(models.Model):
     ROLE_CHOICES = [
@@ -39,4 +41,3 @@ class UserAssignment(models.Model):
 
     def __str__(self):
         return f"({self.user.username}, {self.category.title}, {self.level})"
-

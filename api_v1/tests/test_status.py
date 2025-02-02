@@ -1,76 +1,76 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
-from core.models import Project
+from core.models import Status
 from django.urls import reverse
 from django.contrib.auth.models import Permission
-
 from core.models.custom_user import CustomUser
 
 
-class ProjectAPITestCase(APITestCase):
+class StatusAPITestCase(APITestCase):
     def setUp(self):
-        """Setup test data, including users and projects"""
+        """Setup test data, including users and status"""
         self.user = CustomUser.objects.create_user(username="user", password="testpass")
         self.user2 = CustomUser.objects.create_user(username="user2", password="testpass")
 
         self.set_permissions(self.user)
 
-        self.project1 = Project.objects.create(name="Project One", description="Test project", trigram="P01", order=1)
+        self.status1 = Status.objects.create(status="status One")
+        self.status2 = Status.objects.create(status="status Two", state="active")
 
-        self.project2 = Project.objects.create(
-            name="Project Two", description="Another test project", trigram="P02", order=2
-        )
+        self.list_url = reverse("status-list")
+        self.detail_url = reverse("status-detail", kwargs={"pk": self.status1.id})
 
-        self.list_url = reverse("project-list")  # Name from your URL patterns
-        self.detail_url = reverse("project-detail", kwargs={"pk": self.project1.id})
-
-        self.create_data = {"name": "New Project", "description": "A new project", "trigram": "NP1", "order": 3}
-        self.update_data = {"name": "Updated Project"}
+        self.create_data = {
+            "status": "New status",
+            "state": "active",
+        }
+        self.update_data = {"status": "Updated status"}
 
     def set_permissions(self, user: CustomUser):
-        view_project = Permission.objects.get(codename="view_project")
-        change_project = Permission.objects.get(codename="change_project")
-        delete_project = Permission.objects.get(codename="delete_project")
-        add_project = Permission.objects.get(codename="add_project")
-        user.user_permissions.add(view_project, change_project, delete_project, add_project)
+        view_status = Permission.objects.get(codename="view_status")
+        change_status = Permission.objects.get(codename="change_status")
+        delete_status = Permission.objects.get(codename="delete_status")
+        add_status = Permission.objects.get(codename="add_status")
+        user.user_permissions.add(view_status, change_status, delete_status, add_status)
 
     ## TEST CRUD OPERATIONS ##
 
-    def test_get_project_list(self):
-        """Ensure we can retrieve a list of projects"""
+    def test_get_status_list(self):
+        """Ensure we can retrieve a list of status"""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
-    def test_get_project_detail(self):
-        """Ensure we can retrieve a single project"""
+    def test_get_status_detail(self):
+        """Ensure we can retrieve a single status"""
         self.client.force_authenticate(user=self.user)
         response = self.client.get(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], self.project1.name)
+        self.assertEqual(response.data["status"], self.status1.status)
+        self.assertEqual(response.data["state"], "blocked")
 
-    def test_create_project(self):
-        """Ensure we can create a project"""
+    def test_create_status(self):
+        """Ensure we can create a status"""
         self.client.force_authenticate(user=self.user)
         response = self.client.post(self.list_url, self.create_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Project.objects.count(), 3)
+        self.assertEqual(Status.objects.count(), 3)
 
-    def test_update_project(self):
-        """Ensure we can update a project"""
+    def test_update_status(self):
+        """Ensure we can update a status"""
         self.client.force_authenticate(user=self.user)
         response = self.client.patch(self.detail_url, self.update_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.project1.refresh_from_db()
-        self.assertEqual(self.project1.name, "Updated Project")
+        self.status1.refresh_from_db()
+        self.assertEqual(self.status1.status, "Updated status")
 
-    def test_delete_project(self):
-        """Ensure we can delete a project"""
+    def test_delete_status(self):
+        """Ensure we can delete a status"""
         self.client.force_authenticate(user=self.user)
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-        self.assertEqual(Project.objects.count(), 1)
+        self.assertEqual(Status.objects.count(), 1)
 
     ## TEST PERMISSIONS ##
 

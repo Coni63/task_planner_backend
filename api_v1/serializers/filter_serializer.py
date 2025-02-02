@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 
-
 class SearchModelSerializer(serializers.Serializer):
     value = serializers.CharField(max_length=255, required=False, allow_blank=True)
     regex = serializers.BooleanField()
@@ -29,4 +28,3 @@ class SearchRequestModelSerializer(serializers.Serializer):
     start = serializers.IntegerField(default=0)
     length = serializers.IntegerField(required=False, allow_null=True)
     search = SearchModelSerializer(required=False, allow_null=True)
-

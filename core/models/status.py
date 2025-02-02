@@ -1,15 +1,13 @@
-
 import uuid
 from django.db import models
 
 
 class Status(models.Model):
-
     class States(models.TextChoices):
-        PENDING = 'pending'
-        ACTIVE = 'active'
-        CLOSED = 'closed'
-        BLOCKED = 'blocked'
+        PENDING = "pending"
+        ACTIVE = "active"
+        CLOSED = "closed"
+        BLOCKED = "blocked"
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     status = models.CharField(max_length=20)
@@ -27,6 +25,4 @@ class Status(models.Model):
     def can_transition_to(self, next_status):
         from core.models.workflow import WorkflowTransition
 
-        return WorkflowTransition.objects.filter(
-            from_status=self, to_status=next_status
-        ).exists()
+        return WorkflowTransition.objects.filter(from_status=self, to_status=next_status).exists()

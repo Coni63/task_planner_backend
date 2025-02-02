@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0020_alter_customuser_options"),
     ]
@@ -12,8 +11,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name="task",
-            options={
-                "permissions": [("pick_task", "The user is allowed to pick a new task")]
-            },
+            options={"permissions": [("pick_task", "The user is allowed to pick a new task")]},
         ),
     ]

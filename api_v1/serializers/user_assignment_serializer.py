@@ -4,7 +4,6 @@ from .category_serializer import CategorySerializer
 from .user_serializer import UserSerializer
 
 
-
 class UserAssignmentSerializer(BaseSerializer):
     user = UserSerializer(read_only=True)
     category = CategorySerializer(read_only=True)
@@ -18,4 +17,3 @@ class UserAssignmentSimpleSerializer(BaseSerializer):
     class Meta:
         model = UserAssignment
         fields = "__all__"
-

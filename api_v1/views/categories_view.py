@@ -10,9 +10,9 @@ class CategoryList(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             self.permission_classes = [CanReadCategories]
-        elif self.request.method == 'POST':
+        elif self.request.method == "POST":
             self.permission_classes = [CanCreateCategories]
 
         return super(CategoryList, self).get_permissions()
@@ -23,11 +23,11 @@ class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CategorySerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             self.permission_classes = [CanReadCategories]
-        elif self.request.method == 'DELETE':
+        elif self.request.method == "DELETE":
             self.permission_classes = [CanDeleteCategories]
-        elif self.request.method in ['PUT', 'PATCH']:
+        elif self.request.method in ["PUT", "PATCH"]:
             self.permission_classes = [CanUpdateCategories]
 
         return super(CategoryDetail, self).get_permissions()

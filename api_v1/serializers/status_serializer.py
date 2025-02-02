@@ -1,14 +1,14 @@
-
 from core.models import Status, WorkflowTransition
 from api_v1.serializers.base_serializer import BaseSerializer
 from rest_framework import serializers
+
 
 class StatusSerializer(BaseSerializer):
     class Meta:
         model = Status
         fields = "__all__"
 
-    
+
 class StatusSerializerWithTransition(BaseSerializer):
     transitions = serializers.SerializerMethodField()
 
@@ -22,6 +22,4 @@ class StatusSerializerWithTransition(BaseSerializer):
         based on workflow transitions.
         """
         transitions = WorkflowTransition.objects.filter(from_status=obj)
-        return [
-            StatusSerializer(transition.to_status).data for transition in transitions
-        ]
+        return [StatusSerializer(transition.to_status).data for transition in transitions]

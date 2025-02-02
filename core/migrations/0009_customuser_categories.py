@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("core", "0008_task_created_at"),
     ]
@@ -13,8 +12,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="customuser",
             name="categories",
-            field=models.ManyToManyField(
-                through="core.UserAssignment", to="core.category"
-            ),
+            field=models.ManyToManyField(through="core.UserAssignment", to="core.category"),
         ),
     ]

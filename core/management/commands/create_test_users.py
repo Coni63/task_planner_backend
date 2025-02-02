@@ -4,6 +4,7 @@ from django.core.management.base import BaseCommand
 from core.models import Category, CustomUser, Project, Status, Task, UserAssignment, WorkflowTransition
 from django.contrib.auth.models import Group
 
+
 class Command(BaseCommand):
     help = "Generate test data"
 
@@ -18,8 +19,8 @@ class Command(BaseCommand):
         self.create_user_assignments()
 
     def create_groups(self):
-        groups = ['ADMIN', 'COORDINATOR', 'MANAGER', 'MEMBER']
-        
+        groups = ["ADMIN", "COORDINATOR", "MANAGER", "MEMBER"]
+
         for group_name in groups:
             group, created = Group.objects.get_or_create(name=group_name)
             if created:
@@ -41,10 +42,10 @@ class Command(BaseCommand):
                 if i == 0:
                     user.is_superuser = True
                     user.is_staff = True
-                    admin_group = Group.objects.get(name='ADMIN')
+                    admin_group = Group.objects.get(name="ADMIN")
                     user.groups.add(admin_group)
                 elif i == 1:
-                    member_group = Group.objects.get(name='MEMBER')
+                    member_group = Group.objects.get(name="MEMBER")
                     user.groups.add(member_group)
                 user.save()
                 self.stdout.write(self.style.SUCCESS(f"Created user: {username} with password: {password}"))
@@ -110,9 +111,7 @@ class Command(BaseCommand):
         for from_status, to_status in data:
             from_status = Status.objects.get(status=from_status)
             to_status = Status.objects.get(status=to_status)
-            transition, created = WorkflowTransition.objects.get_or_create(
-                from_status=from_status, to_status=to_status
-            )
+            transition, created = WorkflowTransition.objects.get_or_create(from_status=from_status, to_status=to_status)
             if created:
                 transition.save()
                 self.stdout.write(self.style.SUCCESS(f"Transition created: {from_status} -> {to_status}"))
@@ -157,18 +156,18 @@ class Command(BaseCommand):
                 project=project,
                 estimated_duration=estimated_duration,
                 expected_finalization=expected_finalization,
-                category=category
+                category=category,
             )
 
             task_references.append(task)
 
             # Add dependencies
-            num_dependencies = random.randint(0, min(2, len(task_references)-1))
+            num_dependencies = random.randint(0, min(2, len(task_references) - 1))
             dependencies = random.sample(task_references[:-1], num_dependencies)
 
             for dep in dependencies:
                 task.dependencies.add(dep)
-            
+
             self.stdout.write(self.style.SUCCESS(f"Successfully create a task - {len(dependencies)} dependancies"))
 
     def create_user_assignments(self):
@@ -182,12 +181,10 @@ class Command(BaseCommand):
             categories = Category.objects.all()
 
             for category in categories:
-                level = random.choice(["Blocked", 'Junior', 'Medior', 'Senior'])
+                level = random.choice(["Blocked", "Junior", "Medior", "Senior"])
                 try:
-                    user_assignment = UserAssignment.objects.create(
-                        user=user, category=category, level=level
-                    )
+                    user_assignment = UserAssignment.objects.create(user=user, category=category, level=level)
                     user_assignment.save()
                     self.stdout.write(self.style.SUCCESS(f"Assignment created: {username} {category.title} {level}"))
-                except:
+                except Exception:
                     self.stdout.write(self.style.WARNING(f"Assignment {username} {category.title} already exists"))
