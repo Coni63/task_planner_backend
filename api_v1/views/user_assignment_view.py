@@ -7,7 +7,7 @@ from api_v1.permissions import (
     CanUpdateUserAssignment,
 )
 from core.models import UserAssignment
-from api_v1.serializers import UserAssignmentSerializer
+from api_v1.serializers import UserAssignmentSimpleSerializer
 from django_filters import rest_framework as filters
 
 
@@ -19,7 +19,7 @@ class UserAssignmentFilter(filters.FilterSet):
 
 class UserAssignmentList(generics.ListCreateAPIView):
     queryset = UserAssignment.objects.all()
-    serializer_class = UserAssignmentSerializer
+    serializer_class = UserAssignmentSimpleSerializer
     filter_backends = (filters.DjangoFilterBackend,)
     filterset_class = UserAssignmentFilter
 
@@ -34,7 +34,7 @@ class UserAssignmentList(generics.ListCreateAPIView):
 
 class UserAssignmentDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserAssignment.objects.all()
-    serializer_class = UserAssignmentSerializer
+    serializer_class = UserAssignmentSimpleSerializer
 
     def get_permissions(self):
         if self.request.method == "GET":
