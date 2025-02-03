@@ -19,6 +19,19 @@ class IsActiveUser(permissions.BasePermission):
         return _is_authenticated(request)
 
 
+class IsOwnerOrReadOnly(permissions.BasePermission):
+    """
+    Custom permission to only allow users to edit their own information.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed for any request
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # Write permissions are only allowed if the user is modifying their own profile
+        return obj == request.user
+
 """
 Categories Permissions
 """
@@ -117,17 +130,6 @@ class CanDeleteCustomUser(permissions.BasePermission):
 class CanCreateCustomUser(permissions.BasePermission):
     def has_permission(self, request, view):
         return _is_authenticated(request) and _has_group(request, "add_customuser")
-
-
-class CanUpdateSomeoneElseCustomUser(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return _is_authenticated(request) and _has_group(request, "change_someone_else_user")
-
-
-class CanDeleteSomeoneElseCustomUser(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return _is_authenticated(request) and _has_group(request, "delete_someone_else_user")
-
 
 """
 Task Permissions

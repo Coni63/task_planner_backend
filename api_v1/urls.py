@@ -1,7 +1,6 @@
 import uuid
 from django.urls import path, register_converter
 
-from api_v1.views.user_view import MyselfDetail
 from api_v1.views.workflow_view import WorkflowTransitionDetail, WorkflowTransitionList
 
 from .views.menu_view import MenuView
@@ -44,7 +43,6 @@ urlpatterns = [
     path("menu/", MenuView.as_view(), name="menu-view"),
     path("users/", UserList.as_view(), name="user-list"),
     path("users/<uuid:pk>/", UserDetail.as_view(), name="user-detail"),
-    path("users/me/", MyselfDetail.as_view(), name="myself-detail"),
     path("categories/", CategoryList.as_view(), name="category-list"),
     path("categories/<uuid:pk>/", CategoryDetail.as_view(), name="category-detail"),
     path("user-assignement/", UserAssignmentList.as_view(), name="user-assignement-list"),
