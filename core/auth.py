@@ -8,7 +8,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -55,7 +54,6 @@ class CustomTokenRefreshView(TokenRefreshView):
             "expires_in": exp - int(datetime.datetime.now().timestamp()),  # Calculate remaining time
             "exp": exp,  # Expiration timestamp
         }
-
         return Response(custom_response)
 
 

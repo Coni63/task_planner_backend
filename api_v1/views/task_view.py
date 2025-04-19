@@ -78,6 +78,7 @@ class TaskListView(views.APIView):
         serializer = SearchRequestModelSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         params = serializer.validated_data
+<<<<<<< HEAD
 
         query_base = Task.objects.filter(status__state="closed")
 
@@ -119,3 +120,47 @@ class TaskListView(views.APIView):
         }
 
         return Response(response_data, status=status.HTTP_200_OK)
+=======
+        
+        query_base = Task.objects.filter(status__state='closed')
+        
+        # Filtering based on individual column search
+        for col in params['columns']:
+            if col['searchable'] and col['search']['value']:
+                lookup = {f"{col['data']}__icontains": col['search']['value']}
+                query_base = query_base.filter(**lookup)
+                
+        # Global search across all searchable columns
+        if params.get('search') and params['search']['value']:
+            search_filters = Q()
+            for col in params['columns']:
+                if col['searchable']:
+                    search_filters |= Q(**{f"{col['data']}__icontains": params['search']['value']})
+            query_base = query_base.filter(search_filters)
+        
+        # Ordering
+        for order in params['order']:
+            col = params['columns'][order['column']]
+            if col['orderable']:
+                direction = '' if order['dir'] == 'asc' else '-'
+                query_base = query_base.order_by(f"{direction}{col['data']}")
+        
+        # Count total and filtered records
+        total = Task.objects.count()
+        filtered = query_base.count()
+        
+        # Pagination
+        if params.get('length') is not None:
+            query_base = query_base[params['start']:params['start'] + params['length']]
+        
+        items = TaskSerializer(query_base, many=True).data
+        
+        response_data = {
+            'items': items,
+            'total': total,
+            'filtered': filtered,
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+>>>>>>> dockerize

@@ -4,8 +4,9 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
+
     dependencies = [
-        ("core", "0011_status_dark_color"),
+        ("task_manager", "0011_status_dark_color"),
     ]
 
     operations = [
