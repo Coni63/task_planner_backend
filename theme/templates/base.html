@@ -1,0 +1,29 @@
+{% load static %}
+{% load static tailwind_tags %}
+{% load django_htmx %}
+{% load lucide %}
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+	<head>
+    <title>Django Tailwind</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<meta name="description" content="A layout example that shows off a responsive product landing page.">
+		<title>HTMX Todos</title>
+
+		<script src="https://unpkg.com/lucide@latest"></script>
+		<!-- <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+		<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script> -->
+		<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+		{% tailwind_css %}
+		{% htmx_script %}
+	</head>
+
+	<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+		{% block content %}
+		{% endblock %}
+	</body>
+
+</html>

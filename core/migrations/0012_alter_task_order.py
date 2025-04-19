@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("task_manager", "0011_status_dark_color"),
+        ("core", "0011_status_dark_color"),
     ]
 
     operations = [

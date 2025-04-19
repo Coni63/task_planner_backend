@@ -50,12 +50,19 @@ INSTALLED_APPS = [
     'django_filters',
     'drf_spectacular',
     'django_q',
+    "django_htmx",
+
+    'tailwind',
+    'theme',
+    'django_browser_reload',
+    "lucide",
 
     # Custom apps
     'core',
     'api_v1',
     'optimization',
     'stats',
+    'base',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +74,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     'djangorestframework_camel_case.middleware.CamelCaseMiddleWare',
+    "django_htmx.middleware.HtmxMiddleware",
+    "django_browser_reload.middleware.BrowserReloadMiddleware",
 ]
 
 ROOT_URLCONF = "multitaskill.urls"
@@ -82,6 +91,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+            ],
+            "builtins": [
+                "lucide.templatetags.lucide",
             ],
         },
     },
@@ -136,6 +148,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -204,3 +219,6 @@ Q_CLUSTER = {
     'cpu_affinity': 1,
     'save_limit': 250,
 }
+
+NPM_BIN_PATH = 'npm.cmd'
+TAILWIND_APP_NAME = 'theme'

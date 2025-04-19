@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<i data-lucide="volume-2" class="my-class"></i>
+  <i data-lucide="x"></i>
+  <i data-lucide="menu"></i>
+  {% lucide "arrow-down" size=40 class="mr-4" %}
+
+<div class="pure-g font-serif leading-normal tracking-normal" id="counter-value">
+    <div class="pure-u-1 counter-container">
+        <h1>HTMX Counter Demo</h1>
+        
+        <div class="counter-display">
+            {{ counter }}
+        </div>
+        
+        <div class="counter-controls">
+            <button class="pure-button button-error"
+                    hx-post="{% url 'decrement' %}"
+                    hx-target="#counter-value" hx-swap="outerHTML">
+                -
+            </button>
+            
+            <button class="pure-button button-success"
+                    hx-post="{% url 'increment' %}"
+                    hx-target="#counter-value" 
+                    hx-swap="outerHTML">
+                +
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="flex flex-col items-center mx-10 md:mx-20">
+    <h1 class="text-2xl font-bold m-4">Foo's Tasks</h1>
+    <div class="w-full max-w-2xl">
+      <ul class="list bg-base-100 rounded-box shadow-md">
+        <li class="list-row">
+          <input type="checkbox" checked class="checkbox checkbox-lg checkbox-info mr-4" />
+          <span class="flex-1 text-lg text-gray-500">foo</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="container mx-auto">
+    <section class="flex items-center justify-center">
+        <h1 class="text-5xl">Django + Tailwind = ❤️ 2</h1>
+    </section>
+</div>
+
+
+
+
+<div class="container mx-auto p-4">
+    <h1 class="text-4xl font-bold mb-6">Dracula Theme Test</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Base Colors</h2>
+                <div class="flex flex-col gap-2">
+                    <div class="bg-base-100 p-2">base-100</div>
+                    <div class="bg-base-200 p-2">base-200</div>
+                    <div class="bg-base-300 p-2">base-300</div>
+                    <div class="bg-base-content text-base-300 p-2">base-content</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Primary & Secondary</h2>
+                <div class="flex flex-col gap-2">
+                    <div class="bg-primary text-primary-content p-2">primary</div>
+                    <div class="bg-secondary text-secondary-content p-2">secondary</div>
+                    <div class="bg-accent text-accent-content p-2">accent</div>
+                    <div class="bg-neutral text-neutral-content p-2">neutral</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Buttons</h2>
+                <div class="flex flex-wrap gap-2">
+                    <button class="btn">Default</button>
+                    <button class="btn btn-primary">Primary</button>
+                    <button class="btn btn-secondary">Secondary</button>
+                    <button class="btn btn-accent">Accent</button>
+                    <button class="btn btn-outline">Outline</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200 shadow-xl">
+            <div class="card-body">
+                <h2 class="card-title">Status Colors</h2>
+                <div class="flex flex-col gap-2">
+                    <div class="bg-info text-info-content p-2">info</div>
+                    <div class="bg-success text-success-content p-2">success</div>
+                    <div class="bg-warning text-warning-content p-2">warning</div>
+                    <div class="bg-error text-error-content p-2">error</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script >
+    lucide.createIcons();
+  </script>
+
+{% endblock %}

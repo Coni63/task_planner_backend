@@ -15,3 +15,8 @@ poetry run coverage run --source='.' manage.py test
 poetry run coverage run --source='.' manage.py test api_v1.tests.test_category
 poetry run coverage xml
 ```
+
+```
+poetry run python manage.py tailwind install
+poetry run python manage.py tailwind start
+```
