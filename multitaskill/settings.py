@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_q',
     "django_htmx",
+    'django_cotton',
 
     'tailwind',
     'theme',
