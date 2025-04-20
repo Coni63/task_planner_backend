@@ -22,14 +22,25 @@
 		{% endblock %}
 	</head>
 
-	<body hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
+	<body class="min-h-screen flex flex-col" hx-headers='{"x-csrftoken": "{{ csrf_token }}"}'>
 		<c-header></c-header>
-		{% if user.is_authenticated %}
-			{% include 'sidebar.html' %}
-		{% else %}
-			{% block main_content %}
-			{% endblock %}
-		{% endif %}
+
+		<div class="flex-1 flex">
+			<div class="drawer w-full">
+				<input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+				<div class="drawer-content">
+				  <!-- Page content here -->
+				  <div>
+					{% block main_content %}
+					{% endblock %}
+				  </div>
+				</div> 
+				<div class="drawer-side">
+					{% include 'sidebar.html' %}
+				</div>
+			</div>
+		</div>
+
 		<c-footer></c-footer>
 	</body>
 

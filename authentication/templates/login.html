@@ -13,6 +13,8 @@
           <form method="post" action="{% url 'login' %}">
             {% csrf_token %}
             
+            <c-messages></c-messages>
+
             <div class="form-control w-full mb-4">
               <label class="label" for="id_username">
                 <span class="label-text">Username</span>

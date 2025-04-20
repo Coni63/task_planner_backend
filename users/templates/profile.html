@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main_content %}
+<div class="container mx-auto p-4">
+  <div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+      <h2 class="card-title text-2xl mb-4">Profile Settings</h2>
+      
+      <form method="post" enctype="multipart/form-data" class="space-y-4">
+        {% csrf_token %}
+        
+        <!-- Avatar Upload -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Profile Picture</span>
+          </label>
+          <div class="flex items-center space-x-4">
+            <div class="avatar">
+              <div class="w-24 rounded-full">
+                <img src="{{ user.get_avatar }}" alt="Profile Picture" />
+              </div>
+            </div>
+            <input type="file" name="avatar" class="file-input file-input-bordered w-full max-w-xs" />
+          </div>
+        </div>
+
+        <!-- User Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Username</span>
+            </label>
+            <input type="text" name="username" value="{{ user.username }}" class="input input-bordered" required />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Role</span>
+            </label>
+            <select name="role" class="select select-bordered">
+              {% for value, name in user.Role.choices %}
+                <option value="{{ value }}" {% if user.role == value %}selected{% endif %}>{{ name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">First Name</span>
+            </label>
+            <input type="text" name="first_name" value="{{ user.first_name }}" class="input input-bordered" />
+          </div>
+
+          <div class="form-control">
+            <label class="label">
+              <span class="label-text">Last Name</span>
+            </label>
+            <input type="text" name="last_name" value="{{ user.last_name }}" class="input input-bordered" />
+          </div>
+        </div>
+
+        <!-- Email (readonly) -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text">Email</span>
+          </label>
+          <input type="email" value="{{ user.email }}" class="input input-bordered" readonly />
+        </div>
+
+        <!-- Password Change -->
+        <div class="collapse collapse-arrow border border-base-300 rounded-box mt-6">
+          <input type="checkbox" class="peer" /> 
+          <div class="collapse-title font-medium">
+            Change Password
+          </div>
+          <div class="collapse-content"> 
+            <div class="space-y-4 pt-4">
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Current Password</span>
+                </label>
+                <input type="password" name="current_password" class="input input-bordered" />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">New Password</span>
+                </label>
+                <input type="password" name="new_password1" class="input input-bordered" />
+              </div>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text">Confirm New Password</span>
+                </label>
+                <input type="password" name="new_password2" class="input input-bordered" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-actions justify-end mt-6">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

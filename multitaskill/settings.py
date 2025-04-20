@@ -59,10 +59,10 @@ INSTALLED_APPS = [
     "lucide",
 
     # Custom apps
-    'core',
-    'api_v1',
-    'optimization',
-    'stats',
+    # 'core',
+    # 'api_v1',
+    # 'optimization',
+    # 'stats',
     'base',
     'authentication',	
     'users',
@@ -161,7 +161,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-AUTH_USER_MODEL = "core.CustomUser"
+AUTH_USER_MODEL = "users.CustomUser"
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -226,3 +226,6 @@ Q_CLUSTER = {
 
 NPM_BIN_PATH = 'npm.cmd'
 TAILWIND_APP_NAME = 'theme'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

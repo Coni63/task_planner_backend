@@ -1,155 +1,120 @@
 
-  <div class="drawer">
-    <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
-    <div class="drawer-content">
-      <!-- Page content here -->
-      <div class="w-full h-full">
-        {% block main_content %}
-        {% endblock %}
+
+<label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
+<div class="menu p-4 min-h-full bg-base-200 text-base-content">
+  <!-- Sidebar content -->
+  <div class="flex items-center gap-4 p-4 mb-6">
+    <div class="avatar">
+      <div class="w-10 rounded-full">
+        <img src="{{ company_logo_url|default:'https://placehold.co/40x40' }}" alt="Company Logo" />
       </div>
-    </div> 
-    <div class="drawer-side">
-      <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
-      <div class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-        <!-- Sidebar content -->
-        <div class="flex items-center gap-4 p-4 mb-6">
-          <div class="avatar">
-            <div class="w-10 rounded-full">
-              <img src="{{ company_logo_url|default:'https://placehold.co/40x40' }}" alt="Company Logo" />
-            </div>
-          </div>
-          <div class="font-bold text-xl">Company Name</div>
-        </div>
-        
-        <ul class="menu bg-base-200 rounded-box">
-          <!-- Dashboard menu item -->
-          <li>
-            <a class="active">
-              {% lucide "house" size=20 class="mr-2" %}
-              Dashboard
-            </a>
-          </li>
+    </div>
+    <div class="font-bold text-xl">Company Name</div>
+  </div>
+  
+  <ul class="menu bg-base-200 rounded-box">
+    <!-- Dashboard menu item -->
+    <li>
+      <a class="active">
+        {% lucide "house" size=20 class="mr-2" %}
+        Dashboard
+      </a>
+    </li>
 
-          <!-- Projects menu with submenu -->
-          <li>
-            <details open>
-              <summary>
-                {% lucide "folder" size=20 class="mr-2" %}
-                Projects
-              </summary>
-              <ul>
-                <li>
-                  <a>
-                    {% lucide "layers" size=16 class="mr-2" %}
-                    Active Projects
-                  </a>
-                </li>
-                <li>
-                  <a>
-                    {% lucide "square-check" size=16 class="mr-2" %}
-                    Completed
-                  </a>
-                </li>
-                <li>
-                  <a>
-                    {% lucide "clock" size=16 class="mr-2" %}
-                    On Hold
-                  </a>
-                </li>
-              </ul>
-            </details>
-          </li>
-
-          <!-- Tasks menu item -->
+    <!-- Projects menu with submenu -->
+    <li>
+      <details open>
+        <summary>
+          {% lucide "folder" size=20 class="mr-2" %}
+          Projects
+        </summary>
+        <ul>
           <li>
             <a>
-              {% lucide "circle-check" size=20 class="mr-2" %}
-              Tasks
-              <span class="badge badge-primary badge-sm">3</span>
+              {% lucide "layers" size=16 class="mr-2" %}
+              Active Projects
             </a>
           </li>
-
-          <!-- Reports menu item -->
-          <li>
-            <details>
-              <summary>
-                {% lucide "chart-bar" size=20 class="mr-2" %}
-                Reports
-              </summary>
-              <ul>
-                <li>
-                  <a>
-                    {% lucide "chart-pie" size=16 class="mr-2" %}
-                    Analytics
-                  </a>
-                </li>
-                <li>
-                  <a>
-                    {% lucide "trending-up" size=16 class="mr-2" %}
-                    Performance
-                  </a>
-                </li>
-                <li>
-                  <a>
-                    {% lucide "dollar-sign" size=16 class="mr-2" %}
-                    Finance
-                  </a>
-                </li>
-              </ul>
-            </details>
-          </li>
-
-          <!-- Team menu item -->
           <li>
             <a>
-              {% lucide "users" size=20 class="mr-2" %}
-              Team
+              {% lucide "square-check" size=16 class="mr-2" %}
+              Completed
             </a>
           </li>
-
-          <div class="divider"></div>
-
-          <!-- Settings menu item -->
           <li>
             <a>
-              {% lucide "settings" size=20 class="mr-2" %}
-              Settings
-            </a>
-          </li>
-          
-          <!-- Help menu item -->
-          <li>
-            <a>
-              {% lucide "circle-help" size=20 class="mr-2" %}
-              Help Center
+              {% lucide "clock" size=16 class="mr-2" %}
+              On Hold
             </a>
           </li>
         </ul>
+      </details>
+    </li>
 
-        <!-- User profile at bottom of sidebar -->
-        <div class="mt-auto">
-          <div class="divider"></div>
-          <div class="flex items-center p-4 mt-4 bg-base-100 rounded-lg">
-            <div class="avatar online">
-              <div class="w-10 rounded-full">
-                <img src="{{ user_avatar_url|default:'https://placehold.co/40x40' }}" alt="User Avatar" />
-              </div>
-            </div>
-            <div class="ml-3">
-              <div class="font-medium">{{ user.name|default:"John Doe" }}</div>
-              <div class="text-sm opacity-50">{{ user.role|default:"Administrator" }}</div>
-            </div>
-            <div class="dropdown dropdown-end ml-auto">
-              <label tabindex="0" class="btn btn-ghost btn-circle btn-sm">
-                {% lucide "chevron-down" size=16 %}
-              </label>
-              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
-                <li><a>Profile</a></li>
-                <li><a>Logout</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    <!-- Tasks menu item -->
+    <li>
+      <a>
+        {% lucide "circle-check" size=20 class="mr-2" %}
+        Tasks
+        <span class="badge badge-primary badge-sm">3</span>
+      </a>
+    </li>
+
+    <!-- Reports menu item -->
+    <li>
+      <details>
+        <summary>
+          {% lucide "chart-bar" size=20 class="mr-2" %}
+          Reports
+        </summary>
+        <ul>
+          <li>
+            <a>
+              {% lucide "chart-pie" size=16 class="mr-2" %}
+              Analytics
+            </a>
+          </li>
+          <li>
+            <a>
+              {% lucide "trending-up" size=16 class="mr-2" %}
+              Performance
+            </a>
+          </li>
+          <li>
+            <a>
+              {% lucide "dollar-sign" size=16 class="mr-2" %}
+              Finance
+            </a>
+          </li>
+        </ul>
+      </details>
+    </li>
+
+    <!-- Team menu item -->
+    <li>
+      <a>
+        {% lucide "users" size=20 class="mr-2" %}
+        Team
+      </a>
+    </li>
+
+    <div class="divider"></div>
+
+    <!-- Settings menu item -->
+    <li>
+      <a>
+        {% lucide "settings" size=20 class="mr-2" %}
+        Settings
+      </a>
+    </li>
+    
+    <!-- Help menu item -->
+    <li>
+      <a>
+        {% lucide "circle-help" size=20 class="mr-2" %}
+        Help Center
+      </a>
+    </li>
+  </ul>
+
+</div>

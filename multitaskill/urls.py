@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/v1/', include('api_v1.urls')),
+    # path('api/v1/', include('api_v1.urls')),
 
     # Documentation
     path('docs/', SpectacularAPIView.as_view(), name='schema'),
@@ -34,3 +35,6 @@ urlpatterns = [
     
     path("__reload__/", include("django_browser_reload.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

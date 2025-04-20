@@ -1,20 +1,27 @@
 {% if user.is_authenticated %}
-    <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-        <div class="w-10 rounded-full">
-            <img
-            alt="Tailwind CSS Navbar component"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+    <div class="flex items-center ml-3 bg-base-100 rounded-lg">
+        <div class="avatar online">
+          <div class="w-10 rounded-full">
+            <img src="{{ user.get_avatar }}" alt="User Avatar" />
+          </div>
         </div>
+        <div class="ml-3">
+          <div class="font-medium">{{ user.username }}</div>
+          <div class="text-sm opacity-50">{{ user.role }}</div>
         </div>
-        <ul
-        tabindex="0"
-        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-        <li><a href="{% url 'my-profile' %}">Profile</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
-        </ul>
-    </div>
+        <div class="dropdown dropdown-end ml-auto">
+          <label tabindex="0" class="btn btn-ghost btn-circle btn-sm">
+            {% lucide "chevron-down" size=16 %}
+          </label>
+          <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
+            <li><a href="{% url 'my-profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+          </ul>
+        </div>
+      </div>
 {% else %}
     <a class="btn btn-md" href="{% url 'register' %}">Register</a>
     <a class="btn btn-md" href="{% url 'login' %}">Login</a>
 {% endif %}
+
+
