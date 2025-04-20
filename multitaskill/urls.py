@@ -29,5 +29,8 @@ urlpatterns = [
     path('docs/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     
     path('', include('base.urls')),
+    path('auth/', include('authentication.urls'), name='authentication'),
+    path('users/', include('users.urls'), name='users'),
+    
     path("__reload__/", include("django_browser_reload.urls")),
 ]
