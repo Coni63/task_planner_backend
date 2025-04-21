@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'theme',
     'django_browser_reload',
     "lucide",
+    'widget_tweaks',
 
     # Custom apps
     # 'core',

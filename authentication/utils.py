@@ -16,11 +16,11 @@ def is_password_safe(password: str) -> bool:
         return False
     
     # Check if the password contains at least one letter and not only digits
-    if not all(char.isalpha() for char in password):
+    if not any(char.isalpha() for char in password):
         return False
 
     # Check if the password contains at least one special character
-    if not all(char.isalnum() for char in password):
+    if password.isalnum():
         return False
     
     return True

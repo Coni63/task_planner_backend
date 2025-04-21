@@ -3,90 +3,59 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django import forms
 
 from .utils import is_password_safe
+from .forms import LoginForm, RegisterForm
+
+User = get_user_model()
+
 
 def login_user(request):
     if request.user.is_authenticated:
         return redirect('home')
-    
+
+    form = LoginForm(request.POST or None)
+
     if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        remember_me = request.POST.get('remember_me')
-        
-        user = authenticate(request, username=username, password=password)
-        
-        if user is not None:
-            if not remember_me:
-                # Set session expiry to 0 to log out after browser is closed
-                request.session.set_expiry(0)
-            login(request, user)
-            # Redirect to a success page - often a dashboard or home page
-            return redirect('home')  # Replace 'home' with your URL name
-        else:
-            # Authentication failed
-            messages.error(request, 'Invalid username or password')
-            return render(request, 'login.html')
-    elif request.method == 'GET':
-        return render(request, 'login.html')
-    else:
-        return render(request, 'home.html')
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            remember = form.cleaned_data['remember']
+
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                if not remember:
+                    request.session.set_expiry(0)  # Session expires on browser close
+                login(request, user)
+                return redirect('home')
+            else:
+                messages.error(request, 'Invalid username or password')
+
+    return render(request, 'login.html', {'form': form})
 
 
 def register_user(request):
     if request.method == 'POST':
-        username = request.POST.get('username')
-        firstname = request.POST.get('firstname')
-        lastname = request.POST.get('lastname')
-        email = request.POST.get('email')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
-       
-        if password1 != password2:
-            messages.error(request, 'Passwords do not match')
-            return render(request, 'register.html')
-        
-        if is_password_safe(password1) is False:
-            messages.error(request, 'Password is not safe')
-            return render(request, 'register.html')
-        
-        User = get_user_model()
-
-        # Check if username already exists
-        if User.objects.filter(username=username).exists():
-            messages.error(request, 'Username already exists')
-            return render(request, 'register.html')
-        
-        # Check if email already exists
-        if User.objects.filter(email=email).exists():
-            messages.error(request, 'Email already in use')
-            return render(request, 'register.html')
-        
-        # Create new user
-        try:
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            User = get_user_model()
             user = User.objects.create_user(
-                username=username,
-                email=email,
-                password=password1,
-                first_name=firstname,
-                last_name=lastname
+                username=form.cleaned_data['username'],
+                first_name=form.cleaned_data['firstname'],
+                last_name=form.cleaned_data['lastname'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password1']
             )
-            
-            # Log the user in
             login(request, user)
             messages.success(request, 'Account created successfully!')
-            return redirect('home')  # Replace 'home' with your URL name
-        
-        except Exception as e:
-            messages.error(request, f'An error occurred: {str(e)}')
-            return render(request, 'register.html')
-    
-    elif request.method == 'GET':
-        return render(request, 'register.html')
-    
+            return redirect('home')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
-        return render(request, 'home.html')
+        form = RegisterForm()
+
+    return render(request, 'register.html', {'form': form})
 
 
 @login_required

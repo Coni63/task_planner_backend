@@ -1,73 +1,67 @@
+<!-- login.html -->
 {% extends 'base.html' %}
-
 {% block title %}Login{% endblock %}
 
 {% block main_content %}
-
-<!-- Login Form -->
 <div class="auth-container">
-    <div class="form-container">
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title text-2xl font-bold text-center mb-6">Login</h2>
-          <form method="post" action="{% url 'login' %}">
-            {% csrf_token %}
-            
-            <c-messages></c-messages>
+  <div class="form-container">
+    <div class="card bg-base-100 shadow-xl">
+      <div class="card-body">
+        <h2 class="card-title text-2xl font-bold text-center mb-6">Login</h2>
+        <form method="post" action="{% url 'login' %}">
+          {% csrf_token %}
 
-            <div class="form-control w-full mb-4">
-              <label class="label" for="id_username">
-                <span class="label-text">Username</span>
+          <c-messages></c-messages>
+
+          <div class="form-control w-full mb-4">
+            {{ form.username.label_tag }}
+            {{ form.username }}
+            {% if form.username.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.username.errors.0 }}</span>
               </label>
-              <input type="text" name="username" id="id_username" placeholder="Enter your username" class="input input-bordered w-full" required />
-              {% if form.username.errors %}
-                <label class="label">
-                  <span class="label-text-alt text-error">{{ form.username.errors }}</span>
-                </label>
-              {% endif %}
-            </div>
-            
-            <div class="form-control w-full mb-6">
-              <label class="label" for="id_password">
-                <span class="label-text">Password</span>
-              </label>
-              <input type="password" name="password" id="id_password" placeholder="Enter your password" class="input input-bordered w-full" required />
-              {% if form.password.errors %}
-                <label class="label">
-                  <span class="label-text-alt text-error">{{ form.password.errors }}</span>
-                </label>
-              {% endif %}
-            </div>
-            
-            <div class="form-control mb-6">
-              <label class="label cursor-pointer justify-start gap-2">
-                <input type="checkbox" name="remember" class="checkbox checkbox-primary" />
-                <span class="label-text">Remember me</span>
-              </label>
-            </div>
-            
-            <div class="form-control">
-              <button type="submit" class="btn btn-primary w-full">Login</button>
-            </div>
-            
-            {% if form.non_field_errors %}
-              <div class="alert alert-error mt-4">
-                {{ form.non_field_errors }}
-              </div>
             {% endif %}
-            
-            <div class="text-center mt-6">
-              <a href="{% url 'register' %}" class="link link-primary">Forgot password?</a>
+          </div>
+
+          <div class="form-control w-full mb-6">
+            {{ form.password.label_tag }}
+            {{ form.password }}
+            {% if form.password.errors %}
+              <label class="label">
+                <span class="label-text-alt text-error">{{ form.password.errors.0 }}</span>
+              </label>
+            {% endif %}
+          </div>
+
+          <div class="form-control mb-6">
+            <label class="label cursor-pointer justify-start gap-2">
+              {{ form.remember }}
+              <span class="label-text">Remember me</span>
+            </label>
+          </div>
+
+          <div class="form-control">
+            <button type="submit" class="btn btn-primary w-full">Login</button>
+          </div>
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-error mt-4">
+              {{ form.non_field_errors }}
             </div>
-            
-            <div class="divider">OR</div>
-            
-            <div class="text-center">
-              <p>Don't have an account? <a href="{% url 'register' %}" class="link link-primary">Register</a></p>
-            </div>
-          </form>
-        </div>
+          {% endif %}
+
+          <div class="text-center mt-6">
+            <a href="{% url 'register' %}" class="link link-primary">Forgot password?</a>
+          </div>
+
+          <div class="divider">OR</div>
+
+          <div class="text-center">
+            <p>Don't have an account? <a href="{% url 'register' %}" class="link link-primary">Register</a></p>
+          </div>
+        </form>
       </div>
     </div>
   </div>
+</div>
 {% endblock %}

@@ -14,7 +14,7 @@
             {% lucide "chevron-down" size=16 %}
           </label>
           <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-32">
-            <li><a href="{% url 'my-profile' %}">Profile</a></li>
+            <li><a href="{% url 'profile' user.id %}">Profile</a></li>
             <li><a href="{% url 'logout' %}">Logout</a></li>
           </ul>
         </div>

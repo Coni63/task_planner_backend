@@ -21,8 +21,6 @@
                 <img src="{{ user.get_avatar }}" alt="Profile Picture" />
               </div>
             </div>
-            {{ form.avatar|add_class:"file-input file-input-bordered w-full max-w-xs" }}
-            {{ form.avatar.errors }}
           </div>
         </div>
 
@@ -32,8 +30,9 @@
             <label class="label">
               <span class="label-text">Username</span>
             </label>
-            {{ form.username|add_class:"input input-bordered" }}
-            {{ form.username.errors }}
+            <label class="label">
+              <span class="label-text">{{ form.username.value }}</span>
+            </label>
           </div>
 
           <!-- Role -->
@@ -41,6 +40,7 @@
             <label class="label">
               <span class="label-text">Role</span>
             </label>
+
             {% if is_admin and not is_self %}
               {{ form.role|add_class:"select select-bordered" }}
               {{ form.role.errors }}
@@ -56,8 +56,9 @@
             <label class="label">
               <span class="label-text">First Name</span>
             </label>
-            {{ form.first_name|add_class:"input input-bordered" }}
-            {{ form.first_name.errors }}
+            <label class="label">
+              <span class="label-text">{{ form.first_name.value }}</span>
+            </label>
           </div>
 
           <!-- Last Name -->
@@ -65,49 +66,12 @@
             <label class="label">
               <span class="label-text">Last Name</span>
             </label>
-            {{ form.last_name|add_class:"input input-bordered" }}
-            {{ form.last_name.errors }}
+            <label class="label">
+              <span class="label-text">{{ form.last_name.value }}</span>
+            </label>
           </div>
         </div>
 
-        <!-- Email (readonly) -->
-        <div class="form-control">
-          <label class="label">
-            <span class="label-text">Email</span>
-          </label>
-          {{ form.email|add_class:"input input-bordered" }}
-          {{ form.email.errors }}
-        </div>
-
-        <!-- Password Change -->
-        <div class="collapse collapse-arrow border border-base-300 rounded-box mt-6">
-          <input type="checkbox" class="peer" />
-          <div class="collapse-title font-medium">Change Password</div>
-          <div class="collapse-content pt-4 space-y-4">
-            <!-- New Password -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">New Password</span>
-              </label>
-              {{ form.new_password|add_class:"input input-bordered" }}
-              {{ form.new_password.errors }}
-            </div>
-
-            <!-- Confirm Password -->
-            <div class="form-control">
-              <label class="label">
-                <span class="label-text">Confirm New Password</span>
-              </label>
-              {{ form.confirm_password|add_class:"input input-bordered" }}
-              {{ form.confirm_password.errors }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Submit -->
-        <div class="card-actions justify-end mt-6">
-          <button type="submit" class="btn btn-primary">Save Changes</button>
-        </div>
       </form>
     </div>
   </div>
