@@ -3,9 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout, authenticate, login
 from django.contrib import messages
 from django.contrib.auth import get_user_model
-from django import forms
 
-from .utils import is_password_safe
 from .forms import LoginForm, RegisterForm
 
 User = get_user_model()

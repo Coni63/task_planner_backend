@@ -38,7 +38,16 @@ class RegisterForm(forms.Form):
     password1 = forms.CharField(widget=forms.PasswordInput)
     password2 = forms.CharField(widget=forms.PasswordInput)
 
-    def clean(self):
+    def clean_password1(self):
+        cleaned_data = super().clean()
+        password1 = cleaned_data.get("password1")
+
+        if password1 and not is_password_safe(password1):
+            raise forms.ValidationError("Password is not safe")
+
+        return password1
+    
+    def clean_password2(self):
         cleaned_data = super().clean()
         password1 = cleaned_data.get("password1")
         password2 = cleaned_data.get("password2")
@@ -46,19 +55,16 @@ class RegisterForm(forms.Form):
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Passwords do not match")
 
-        if password1 and not is_password_safe(password1):
-            raise forms.ValidationError("Password is not safe")
-
-        return cleaned_data
+        return password2
 
     def clean_username(self):
         username = self.cleaned_data["username"]
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError("Username already exists")
+            raise forms.ValidationError("Username already used")
         return username
 
     def clean_email(self):
-        email = self.cleaned_data["email"]
+        email = self.cleaned_data["email"].lower()
         if User.objects.filter(email=email).exists():
-            raise ValidationError("Email already in use")
+            raise ValidationError("Email already used")
         return email
